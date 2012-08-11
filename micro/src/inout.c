@@ -2,9 +2,11 @@
 #define BAUD 9600
 #define F_CPU 16000000UL
 #include <util/setbaud.h>
+ #include <string.h> 
 
 void setPinMode(int pin, IOMode mode) {
-    if(mode) {
+    // serialPrint(char* string);
+    if(mode == OUTPUT) {
         setMultiPinMode(pins[pin].port, *directionPorts[pins[pin].port] | pins[pin].pin);
     } else {
         setMultiPinMode(pins[pin].port, *directionPorts[pins[pin].port] & ~pins[pin].pin);
@@ -41,10 +43,9 @@ void setupSerial() {
 }
 
 void serialPrint(char* string) {
-    int i = 0;
-    while(string[i] != '\0') {
-        serialPutChar(string[i]);
-        i++;
+    while(*string) {
+        serialPutChar(*string);
+        string++;
     }
 }
 

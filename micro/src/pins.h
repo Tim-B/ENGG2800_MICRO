@@ -28,7 +28,7 @@
         Port port; 
     } Pin;
 
-    Pin pins[1];
+    Pin pins[32];
 
     volatile uint8_t * directionPorts[11];
 
