@@ -30,6 +30,8 @@
     void serialPrint(char*);
     void serialPrintLn(char*);
     void serialPutChar(char);
+    void clearPort(Port);
+    void clearMultiPins(Port, int);
     
 #endif	/* INOUT_H */
 

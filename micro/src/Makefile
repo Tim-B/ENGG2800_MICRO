@@ -1,6 +1,6 @@
 # AVR-GCC Makefile
 PROJECT=tutorial_1
-SOURCES=main.c common.c inout.c arduino_pins.c
+SOURCES=main.c common.c inout.c arduino_pins.c timeutil.c display.c
 CC=avr-gcc
 OBJCOPY=avr-objcopy
 MMCU=atmega1280

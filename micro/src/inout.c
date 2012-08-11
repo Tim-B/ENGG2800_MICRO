@@ -2,10 +2,9 @@
 #define BAUD 9600
 #define F_CPU 16000000UL
 #include <util/setbaud.h>
- #include <string.h> 
+#include <string.h> 
 
 void setPinMode(int pin, IOMode mode) {
-    // serialPrint(char* string);
     if(mode == OUTPUT) {
         setMultiPinMode(pins[pin].port, *directionPorts[pins[pin].port] | pins[pin].pin);
     } else {
@@ -56,4 +55,12 @@ void serialPrintLn(char* string) {
 void serialPutChar(char c) {
     loop_until_bit_is_set(UCSR0A, UDRE0); /* Wait until data register empty. */
     UDR0 = c;
+}
+
+void clearPort(Port port) {
+    clearMultiPins(port, 0xFF);
+}
+
+void clearMultiPins(Port port, int value) {
+    *dataPorts[port] &= ~value;
 }

@@ -7,6 +7,14 @@
 
 #ifndef TIMEUTIL_H
 #define	TIMEUTIL_H
+void setupClock();
+#include <stdint.h>
+uint8_t getHour();
+uint8_t get24Hour();
+uint8_t getMinute();
+uint8_t getSecond();
+uint8_t isPM();
+void setTime(uint32_t);
 
 #endif	/* TIMEUTIL_H */
 
