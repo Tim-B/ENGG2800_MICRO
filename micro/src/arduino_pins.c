@@ -2,7 +2,6 @@
 #include "inout.h"
 
 void setupPins() {
-        serialPutChar((int) &DDRA);
         directionPorts[A] = &DDRA;
         directionPorts[B] = &DDRB;
         directionPorts[C] = &DDRC;
@@ -48,5 +47,32 @@ void setupPins() {
         pins[10].pin = 0x40;
         pins[10].port = B;
         pins[11].pin = 0x80;
-        pins[11].port = B;  
+        pins[11].port = B; 
+        
+        pins[12].pin = 0x01;
+        pins[12].port = A;
+        pins[13].pin = 0x02;
+        pins[13].port = A;
+        pins[14].pin = 0x04;
+        pins[14].port = A;
+        pins[15].pin = 0x08;
+        pins[15].port = A;
+        
+        hourPins[0] = 0;
+        hourPins[1] = 1;
+        hourPins[2] = 2;
+        hourPins[3] = 3;
+        hourPins[4] = 4;
+        hourPins[5] = 5;
+        hourPins[6] = 6;
+        hourPins[7] = 7;
+        hourPins[8] = 8;
+        hourPins[9] = 9;
+        hourPins[10] = 10;
+        hourPins[11] = 11;
+        
+        minPins[0] = 12;
+        minPins[1] = 13;
+        minPins[2] = 14;
+        minPins[3] = 15;
 }

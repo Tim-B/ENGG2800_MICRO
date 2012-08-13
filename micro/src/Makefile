@@ -1,6 +1,6 @@
 # AVR-GCC Makefile
 PROJECT=engg2800_micro
-SOURCES=main.c common.c inout.c arduino_pins.c timeutil.c display.c
+SOURCES=main.c common.c inout.c arduino_pins.c timeutil.c display.c common.h
 CC=avr-gcc
 OBJCOPY=avr-objcopy
 MMCU=atmega1280
@@ -12,7 +12,7 @@ program: $(PROJECT).hex
 	avrdude -p m1280 -b 57600 -c arduino -P ${PORT} -U flash:w:$(PROJECT).hex
 
 $(PROJECT).hex: $(PROJECT).out
-	$(OBJCOPY) -j .text -O ihex $(PROJECT).out $(PROJECT).hex
+	$(OBJCOPY) -j .text -j .data -O ihex $(PROJECT).out $(PROJECT).hex
 	
 $(PROJECT).out: $(SOURCES)
 	$(CC) $(CFLAGS) -o $(PROJECT).out $(SOURCES)	

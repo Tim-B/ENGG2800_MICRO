@@ -7,8 +7,10 @@
 
 #ifndef INOUT_H
     #define INOUT_H
-
+    #include <stdio.h>
     #include "pins.h"
+    #define RX_BUFSIZE 80
+    #define UART_BAUD  9600
 
     typedef enum {
         HIGH = 1,
@@ -27,9 +29,7 @@
     void setMultiPin(Port, int);
     
     void setupSerial();
-    void serialPrint(char*);
-    void serialPrintLn(char*);
-    void serialPutChar(char);
+    
     void clearPort(Port);
     void clearMultiPins(Port, int);
     

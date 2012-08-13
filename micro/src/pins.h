@@ -29,6 +29,8 @@
     } Pin;
 
     Pin pins[32];
+    int hourPins[12];
+    int minPins[4];
 
     volatile uint8_t * directionPorts[11];
 

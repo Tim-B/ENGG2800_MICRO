@@ -4,23 +4,22 @@
 #include <avr/interrupt.h>
 #include <math.h> 
 #include <util/delay.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include "common.h"
 #include "inout.h"
 #include "pins.h"
 #include "timeutil.h"
 
-#define TARGET_PIN 11
 int step = 0;
 char* string;
-
 void setup() {
     setupSerial();
-    setupPins();
+    setupPins(); 
     setupClock();
-    
+    DEBUG_PRINT("I like: %s\n", "eggs");
+    // serialPutChar('t', stderr);
     int i = 0;
-    for(i = 0; i < 12; i++) {
+    for(i = 0; i < 16; i++) {
         setPinMode(i, OUTPUT);
     }
 }
