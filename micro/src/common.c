@@ -16,7 +16,6 @@ void setup() {
     setupSerial();
     setupPins(); 
     setupClock();
-    DEBUG_PRINT("I like: %s\n", "eggs");
     // serialPutChar('t', stderr);
     int i = 0;
     for(i = 0; i < 16; i++) {

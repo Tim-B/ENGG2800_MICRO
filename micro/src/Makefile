@@ -10,6 +10,8 @@ CFLAGS=-mmcu=$(MMCU) -Os -Wall
 	
 program: $(PROJECT).hex
 	avrdude -p m1280 -b 57600 -c arduino -P ${PORT} -U flash:w:$(PROJECT).hex
+	
+	
 
 $(PROJECT).hex: $(PROJECT).out
 	$(OBJCOPY) -j .text -j .data -O ihex $(PROJECT).out $(PROJECT).hex

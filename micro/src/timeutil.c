@@ -4,6 +4,7 @@
 #include "display.h"
 #include <avr/interrupt.h>
 #include "timeutil.h"
+#include "common.h"
 
 uint32_t time = 0;
 uint32_t nextUpdate = 0;
@@ -21,13 +22,14 @@ void setupClock() {
     TCCR1A = 0x00;
     TCNT1 = 0x0BDC;
     TCCR1B = 0x04;
-    setTime(20500);
+    setTime(21480);
     refresh();
 }
 
 ISR(TIMER1_OVF_vect) {
     TCNT1 = 0x0BDC;
     time++;
+    DEBUG_PRINT("Time: %lu\n", time);
     if(time >= 86400) {
         time = 0;
         refresh();
