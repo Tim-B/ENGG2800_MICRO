@@ -5,6 +5,19 @@
 #include <string.h> 
 #include <stdio.h>
 
+#define UBRRH_def UBRRH
+#define UBRRL_def UBRRL
+#define UCSRA_def UCSRA
+#define U2X_def U2X
+#define UCSRC_def UCSRC
+#define UCSRB_def UCSRB
+#define UCSZ1_def UCSZ1
+#define UCSZ0_def UCSZ0
+#define RXEN_def RXEN
+#define TXEN_def TXEN
+#define UDR_def UDR
+#define UDRE_def UDRE
+
 int serialPutChar(char c, FILE *stream);
 FILE uart_output = FDEV_SETUP_STREAM(serialPutChar, NULL, _FDEV_SETUP_WRITE);
 
@@ -35,17 +48,17 @@ void setMultiPin(Port port, int value) {
 }
 
 void setupSerial() {
-    UBRR0H = UBRRH_VALUE;
-    UBRR0L = UBRRL_VALUE;
+    UBRRH_def = UBRRH_VALUE;
+    UBRRL_def = UBRRL_VALUE;
 
     #if USE_2X
     UCSR0A |= _BV(U2X0);
     #else
-    UCSR0A &= ~(_BV(U2X0));
+    UCSRA_def &= ~(_BV(U2X_def));
     #endif
 
-    UCSR0C = _BV(UCSZ01) | _BV(UCSZ00); /* 8-bit data */ 
-    UCSR0B = _BV(RXEN0) | _BV(TXEN0);   /* Enable RX and TX */
+    UCSRC_def = _BV(UCSZ1_def) | _BV(UCSZ0_def); /* 8-bit data */ 
+    UCSRB_def = _BV(RXEN_def) | _BV(TXEN_def);   /* Enable RX and TX */
     
     stdout = &uart_output;
 }
@@ -54,8 +67,8 @@ int serialPutChar(char c, FILE *stream) {
     if (c == '\n') {
         serialPutChar('\r', stream);
     }
-    loop_until_bit_is_set(UCSR0A, UDRE0);
-    UDR0 = c;
+    loop_until_bit_is_set(UCSRA_def, UDRE_def);
+    UDR_def = c;
     return 0;
 }
 

@@ -13,16 +13,18 @@ uint8_t seconds = 0;
 uint8_t minutes = 0;
 uint8_t hours = 0;
 
+#define TIMSK_def TIMSK
+
 volatile uint8_t tot_overflow;
 void refresh();
 
 void setupClock() {
     sei();
-    TIMSK1 = 0x01;
+    TIMSK_def = 0x01;
     TCCR1A = 0x00;
     TCNT1 = 0x0BDC;
     TCCR1B = 0x04;
-    setTime(21480);
+    setTime(36720);
     refresh();
 }
 

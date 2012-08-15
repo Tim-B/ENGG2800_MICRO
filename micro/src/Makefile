@@ -1,15 +1,17 @@
 # AVR-GCC Makefile
 PROJECT=engg2800_micro
-SOURCES=main.c common.c inout.c arduino_pins.c timeutil.c display.c common.h
+SOURCES=main.c common.c display.c inout.c mega_pins.c timeutil.c
 CC=avr-gcc
 OBJCOPY=avr-objcopy
 MMCU=atmega1280
 PORT=COM12
+PROGRAM=arduino
+DEVICE=m1280
 
 CFLAGS=-mmcu=$(MMCU) -Os -Wall
 	
 program: $(PROJECT).hex
-	avrdude -p m1280 -b 57600 -c arduino -P ${PORT} -U flash:w:$(PROJECT).hex
+	avrdude -p ${DEVICE} -b 57600 -c ${PROGRAM} -P ${PORT} -U flash:w:$(PROJECT).hex
 	
 	
 

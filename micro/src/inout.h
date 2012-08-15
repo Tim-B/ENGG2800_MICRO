@@ -13,8 +13,8 @@
     #define UART_BAUD  9600
 
     typedef enum {
-        HIGH = 1,
-        LOW = 0
+        HIGH = 0,
+        LOW = 1
     } IOBit;
 
     typedef enum {
