@@ -13,8 +13,8 @@
     #define UART_BAUD  9600
 
     typedef enum {
-        HIGH = 0,
-        LOW = 1
+        HIGH = 1,
+        LOW = 0
     } IOBit;
 
     typedef enum {
@@ -24,6 +24,7 @@
 
     void setPinMode(int, IOMode);
     void setPin(int, IOBit);
+    int getPin(int);
 
     void setMultiPinMode(Port, int);
     void setMultiPin(Port, int);
@@ -32,6 +33,10 @@
     
     void clearPort(Port);
     void clearMultiPins(Port, int);
+    
+    void setupArray();
+    void clearArray();
+    void setArray(int, IOMode);
     
 #endif	/* INOUT_H */
 

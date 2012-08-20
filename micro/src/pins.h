@@ -20,7 +20,8 @@
         G = 6,
         H = 7,
         J = 9,
-        K = 10        
+        K = 10,
+        L = 11
     } Port;
 
     typedef struct {
@@ -32,9 +33,9 @@
     int hourPins[12];
     int minPins[4];
 
-    volatile uint8_t * directionPorts[11];
+    volatile uint8_t * directionPorts[12];
 
-    volatile uint8_t * dataPorts[11];
+    volatile uint8_t * dataPorts[12];
     
     void setupPins();
 

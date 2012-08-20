@@ -12,6 +12,7 @@ void setupPins() {
         directionPorts[H] = &DDRH;
         directionPorts[J] = &DDRJ;
         directionPorts[K] = &DDRK;
+        directionPorts[L] = &DDRL;
         
         dataPorts[A] = &PORTA;
         dataPorts[B] = &PORTB;
@@ -23,9 +24,14 @@ void setupPins() {
         dataPorts[H] = &PORTH;
         dataPorts[J] = &PORTJ;
         dataPorts[K] = &PORTK;    
+        dataPorts[L] = &PORTL;  
                 
+/*
         pins[0].pin = 0x10;
         pins[0].port = E;
+*/
+        pins[0].pin = 0x10;
+        pins[0].port = A;
         pins[1].pin = 0x20;
         pins[1].port = E;
         pins[2].pin = 0x20;
@@ -57,6 +63,9 @@ void setupPins() {
         pins[14].port = A;
         pins[15].pin = 0x08;
         pins[15].port = A;
+        
+        pins[16].pin = 0x10;
+        pins[16].port = E;
         
         hourPins[0] = 0;
         hourPins[1] = 1;

@@ -1,6 +1,7 @@
 # AVR-GCC Makefile
 PROJECT=engg2800_micro
-SOURCES=main.c common.c display.c inout.c mega_pins.c timeutil.c
+SOURCES=main.c common.c display.c inout.c timeutil.c control.c
+PIN_DEF=arduino_pins.c
 CC=avr-gcc
 OBJCOPY=avr-objcopy
 MMCU=atmega1280
@@ -19,7 +20,7 @@ $(PROJECT).hex: $(PROJECT).out
 	$(OBJCOPY) -j .text -j .data -O ihex $(PROJECT).out $(PROJECT).hex
 	
 $(PROJECT).out: $(SOURCES)
-	$(CC) $(CFLAGS) -o $(PROJECT).out $(SOURCES)	
+	$(CC) $(CFLAGS) -o $(PROJECT).out $(SOURCES) $(PIN_DEF)	
 
 clean:
 	rm -rf *.o

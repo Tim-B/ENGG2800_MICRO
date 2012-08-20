@@ -1,22 +1,12 @@
 #include "inout.h"
+#include "common.h"
 #define BAUD 9600
 #define F_CPU 16000000UL
 #include <util/setbaud.h>
 #include <string.h> 
 #include <stdio.h>
+#include <util/delay.h>
 
-#define UBRRH_def UBRRH
-#define UBRRL_def UBRRL
-#define UCSRA_def UCSRA
-#define U2X_def U2X
-#define UCSRC_def UCSRC
-#define UCSRB_def UCSRB
-#define UCSZ1_def UCSZ1
-#define UCSZ0_def UCSZ0
-#define RXEN_def RXEN
-#define TXEN_def TXEN
-#define UDR_def UDR
-#define UDRE_def UDRE
 
 int serialPutChar(char c, FILE *stream);
 FILE uart_output = FDEV_SETUP_STREAM(serialPutChar, NULL, _FDEV_SETUP_WRITE);
@@ -37,6 +27,10 @@ void setPin(int pin, IOBit mode) {
     } else {
         setMultiPin(pins[pin].port, *dataPorts[pins[pin].port] & ~pins[pin].pin);
     }
+}
+
+int getPin(int pin) {
+    return pins[pin].port & pins[pin].pin;
 }
 
 void setMultiPinMode(Port port, int value) {
@@ -82,4 +76,22 @@ void clearPort(Port port) {
 
 void clearMultiPins(Port port, int value) {
     *dataPorts[port] &= ~value;
+}
+
+void setupArray() {
+    DDRA = 0xFF;
+    PORTA = 0x03;
+}
+
+void clearArray() {
+    PORTA = 0x00;
+    _delay_us(1);
+    PORTA = 0x03;
+    DEBUG_PRINT("Cleared\n");
+}
+
+void setArray(int value, IOMode mode) {
+    PORTA = 0x0D;
+    PORTA = 0x03;
+    DEBUG_PRINT("Set\n");
 }

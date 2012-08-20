@@ -9,18 +9,26 @@
 #include "inout.h"
 #include "pins.h"
 #include "timeutil.h"
+#include "control.h"
 
 int step = 0;
 char* string;
 void setup() {
     setupSerial();
     setupPins(); 
-    setupClock();
+    // setupClock();
+    setupArray();
+    setupControl();
     // serialPutChar('t', stderr);
     int i = 0;
     for(i = 0; i < 16; i++) {
         setPinMode(i, OUTPUT);
     }
+    setPinMode(16, INPUT);
 }
 
-void loop() {}
+void loop() {
+    if(commandWaiting) {
+        readCommand();
+    }
+}
