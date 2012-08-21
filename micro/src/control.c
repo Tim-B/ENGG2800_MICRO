@@ -10,6 +10,9 @@ void setupControl() {
 	
     EIMSK |= 0x10;
     DDRE = 0x00;
+    ADCSRB = 0x40;
+    ACSR = 0x08;
+    DEBUG_PRINT("interrupt setup\n");
     sei();
 }
 
@@ -19,6 +22,10 @@ ISR(INT4_vect)
         return;
     }
     commandWaiting = 1;
+}
+
+ISR (ANALOG_COMP_vect) {
+    DEBUG_PRINT("compare\n");
 }
 
 void readCommand() {
