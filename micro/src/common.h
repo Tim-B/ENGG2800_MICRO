@@ -37,6 +37,17 @@
         #define GIMSK_def GIMSK
         #define INT0_def INT0
         #define F_CPU 16000000UL
+        #define LATCH1_PORT PORTA
+        #define LATCH1_DDR DDRA
+        #define LATCH2_PORT PORTC
+        #define LATCH2_DDR DDRC
+        #define LATCH1_MEMORY 0x03
+        #define LATCH2_MEMORY 0x03
+        #define LATCH1_CLEAR 0x02
+        #define LATCH2_CLEAR 0x02
+        #define LATCH1_SET 0x01
+        #define LATCH2_SET 0x01
+        
     #else
         #define UBRRH_def UBRRH
         #define UBRRL_def UBRRL

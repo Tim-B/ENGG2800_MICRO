@@ -8,11 +8,7 @@ int toggleLED = 0;
 IOBit toggleState = LOW;
 
 void updateDisplay() {
-    clearPort(E);
-    clearPort(G);
-    clearPort(H);
-    clearPort(B);
-    clearPort(A);
+    clearArray();
     setHourDisplay();
     setMinuteDisplay();
     DEBUG_PRINT("Display time: %i:%i\n", getHour(), getMinute());
@@ -20,7 +16,7 @@ void updateDisplay() {
 
 void setHourDisplay() {
     int pin = getHour() - 1;
-    setPin(hourPins[pin], HIGH);
+    setArray(pin, HIGH);
     toggleLED = pin;
 }
 
@@ -30,15 +26,17 @@ void setMinuteDisplay() {
         pin = 11;
     }
     setPin(hourPins[pin], HIGH);
+    setArray(pin, HIGH);
     DEBUG_PRINT("Minute pin: %i\n", pin);
     int minPin = getMinute() % 5;
     if(minPin > 0) {
-        setPin(minPins[minPin - 1], HIGH);
+        setArray((minPin - 1) + 12, HIGH);
     }
 }
 
 void toggle() {
-    setPin(toggleLED, toggleState);
+    setArray(toggleLED, toggleState);
+    DEBUG_PRINT("Toggle LED: %i\n", toggleLED);
     if(toggleState) {
         toggleState = LOW;
     } else {

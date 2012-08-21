@@ -16,9 +16,9 @@ char* string;
 void setup() {
     setupSerial();
     setupPins(); 
-    // setupClock();
+    setupClock();
     setupArray();
-    setupControl();
+    // setupControl();
     // serialPutChar('t', stderr);
     int i = 0;
     for(i = 0; i < 16; i++) {
