@@ -6,9 +6,9 @@
 
 void setupControl() {
     commandWaiting = 0;
-    EICRB |= 0x03;
+    EICR_def |= 0x03;
 	
-    EIMSK |= 0x10;
+    EIMSK_def |= 0x10;
     DDRE = 0x00;
     ADCSRB = 0x40;
     ACSR = 0x08;

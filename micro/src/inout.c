@@ -1,7 +1,6 @@
 #include "inout.h"
 #include "common.h"
 #define BAUD 9600
-#define F_CPU 16000000UL
 #include <util/setbaud.h>
 #include <string.h> 
 #include <stdio.h>
@@ -13,32 +12,37 @@ FILE uart_output = FDEV_SETUP_STREAM(serialPutChar, NULL, _FDEV_SETUP_WRITE);
 
 
 void setPinMode(int pin, IOMode mode) {
+/*
     if(mode == OUTPUT) {
         setMultiPinMode(pins[pin].port, *directionPorts[pins[pin].port] | pins[pin].pin);
     } else {
         setMultiPinMode(pins[pin].port, *directionPorts[pins[pin].port] & ~pins[pin].pin);
     }
+*/
 }
 
 
 void setPin(int pin, IOBit mode) {
+/*
     if(mode) {
         setMultiPin(pins[pin].port, *dataPorts[pins[pin].port] | pins[pin].pin);
     } else {
         setMultiPin(pins[pin].port, *dataPorts[pins[pin].port] & ~pins[pin].pin);
     }
+*/
 }
 
 int getPin(int pin) {
-    return pins[pin].port & pins[pin].pin;
+    // return pins[pin].port & pins[pin].pin;
+    return 0;
 }
 
 void setMultiPinMode(Port port, int value) {
-    *directionPorts[port] = value;
+    // *directionPorts[port] = value;
 }
 
 void setMultiPin(Port port, int value) {
-    *dataPorts[port] = value;
+    // *dataPorts[port] = value;
 }
 
 void setupSerial() {
@@ -71,18 +75,18 @@ int serialGetChar(FILE *stream) {
 }
 
 void clearPort(Port port) {
-    clearMultiPins(port, 0xFF);
+    // clearMultiPins(port, 0xFF);
 }
 
 void clearMultiPins(Port port, int value) {
-    *dataPorts[port] &= ~value;
+    // *dataPorts[port] &= ~value;
 }
 
 void setupArray() {
-    LATCH1_DDR |= 0x3F;
-    LATCH2_DDR |= 0x3F;
+    LATCH1_DDR |= LATCH1_DDRMASK;
+    LATCH2_DDR |= LATCH2_DDRMASK;
     clearArray();
-    // setArray(12, HIGH);
+    setArray(3, HIGH);
 /*
     DEBUG_PRINT("Setting 0:\n");
     setArray(0, HIGH);
@@ -94,35 +98,40 @@ void setupArray() {
 }
 
 void clearArray() {
-    LATCH1_PORT = LATCH1_CLEAR;
     LATCH2_PORT = LATCH2_CLEAR;
     _delay_us(1);
-    LATCH1_PORT = LATCH1_MEMORY;
     LATCH2_PORT = LATCH2_MEMORY;
     DEBUG_PRINT("Cleared\n");
 }
 
 void setArray(int value, IOMode mode) {
+    LATCH1_PORT = 0x04;
+    LATCH2_PORT = LATCH2_SET | 0x40;
+    _delay_us(5);
+    // LATCH2_PORT = LATCH2_MEMORY;
+    return;
     if(value > 7) {
         value = value - 8;
-        LATCH2_PORT = LATCH2_SET | mode << 2 | value << 3;
+        LATCH2_PORT = ~(LATCH2_SET | mode << 2 | value << 3);
+
 /*
         DEBUG_PRINT("LATCH2_SET: %i\n", LATCH2_SET);
         DEBUG_PRINT("Mode: %i, Origional: %i\n", mode << 2, mode);
         DEBUG_PRINT("Value: %i, Origional: %i\n", value << 3, value);
         DEBUG_PRINT("Port: %i\n", LATCH2_PORT);
+        
 */
-        _delay_us(1);
-        LATCH2_PORT = LATCH2_MEMORY;
+        _delay_us(5);
+        LATCH2_PORT = ~LATCH2_MEMORY;
     } else {
-        LATCH1_PORT = LATCH1_SET | mode << 2 | value << 3;
+        LATCH1_PORT = ~(LATCH1_SET | mode << 2 | value << 3);
 /*
         DEBUG_PRINT("LATCH1_SET: %i\n", LATCH1_SET);
         DEBUG_PRINT("Mode: %i, Origional: %i\n", mode << 2, mode);
         DEBUG_PRINT("Value: %i, Origional: %i\n", value << 3, value);
         DEBUG_PRINT("Port: %i\n", LATCH1_PORT);
 */
-        _delay_us(1);
-        LATCH1_PORT = LATCH1_MEMORY;
+        _delay_us(5);
+        LATCH1_PORT = ~LATCH1_MEMORY;
     }
 }

@@ -1,4 +1,3 @@
-#define F_CPU 16000000UL
 #include <avr/io.h>
 #include "inout.h"
 #include "display.h"
@@ -17,17 +16,24 @@ volatile uint8_t tot_overflow;
 void refresh();
 
 void setupClock() {
+
     sei();
     TIMSK_def = 0x01;
-    TCCR1A = 0x00;
-    TCNT1 = 0x0BDC;
+    TCNT0 = 0x0BDC;
     TCCR1B = 0x04;
-    setTime(36720);
+
+    setTime(36840);
     refresh();
+/*
+    TIMSK1 |= (1 << TOIE1);
+    TCCR1B |= (1 << CS11);
+    sei();
+*/
 }
 
+
 ISR(TIMER1_OVF_vect) {
-    TCNT1 = 0x0BDC;
+    TCNT0 = 0x0BDC;
     time++;
     DEBUG_PRINT("Time: %lu\n", time);
     if(time >= 86400) {
@@ -37,6 +43,7 @@ ISR(TIMER1_OVF_vect) {
         refresh();
     }
     toggle();
+    // PORTD = ~PORTD;
 }
 
 void refresh() {

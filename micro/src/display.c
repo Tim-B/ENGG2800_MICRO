@@ -35,11 +35,13 @@ void setMinuteDisplay() {
 }
 
 void toggle() {
-    setArray(toggleLED, toggleState);
+    //setArray(toggleLED, toggleState);
     DEBUG_PRINT("Toggle LED: %i\n", toggleLED);
     if(toggleState) {
+        PORTD = 0xFF;
         toggleState = LOW;
     } else {
+        PORTD = 0x00;
         toggleState = HIGH;
     }
 }

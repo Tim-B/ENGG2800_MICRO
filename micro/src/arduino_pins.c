@@ -2,6 +2,7 @@
 #include "inout.h"
 
 void setupPins() {
+#ifdef ARDUINO
         directionPorts[A] = &DDRA;
         directionPorts[B] = &DDRB;
         directionPorts[C] = &DDRC;
@@ -84,4 +85,72 @@ void setupPins() {
         minPins[1] = 13;
         minPins[2] = 14;
         minPins[3] = 15;
+#else
+        directionPorts[B] = &DDRB;
+        directionPorts[C] = &DDRC;
+        directionPorts[D] = &DDRD;
+        
+        dataPorts[B] = &PORTB;
+        dataPorts[C] = &PORTC;
+        dataPorts[D] = &PORTD;  
+                
+/*
+        pins[0].pin = 0x10;
+        pins[0].port = E;
+*/
+        pins[0].pin = 0x10;
+        pins[0].port = C;
+        pins[1].pin = 0x10;
+        pins[1].port = C;
+        pins[2].pin = 0x10;
+        pins[2].port = C;
+        pins[3].pin = 0x10;
+        pins[3].port = C;
+        pins[4].pin = 0x10;
+        pins[4].port = C;
+        pins[5].pin = 0x10;
+        pins[5].port = C;        
+        pins[6].pin = 0x10;
+        pins[6].port = C;         
+        pins[7].pin = 0x10;
+        pins[7].port = C; 
+        pins[8].pin = 0x10;
+        pins[8].port = C; 
+        pins[9].pin = 0x10;
+        pins[9].port = C;
+        pins[10].pin = 0x10;
+        pins[10].port = C;
+        pins[11].pin = 0x10;
+        pins[11].port = C; 
+        
+        pins[12].pin = 0x10;
+        pins[12].port = C;
+        pins[13].pin = 0x10;
+        pins[13].port = C;
+        pins[14].pin = 0x10;
+        pins[14].port = C;
+        pins[15].pin = 0x10;
+        pins[15].port = C;
+        
+        pins[16].pin = 0x10;
+        pins[16].port = C;
+        
+        hourPins[0] = 0;
+        hourPins[1] = 1;
+        hourPins[2] = 2;
+        hourPins[3] = 3;
+        hourPins[4] = 4;
+        hourPins[5] = 5;
+        hourPins[6] = 6;
+        hourPins[7] = 7;
+        hourPins[8] = 8;
+        hourPins[9] = 9;
+        hourPins[10] = 10;
+        hourPins[11] = 11;
+        
+        minPins[0] = 12;
+        minPins[1] = 13;
+        minPins[2] = 14;
+        minPins[3] = 15;  
+#endif
 }
