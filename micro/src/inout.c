@@ -5,45 +5,11 @@
 #include <string.h> 
 #include <stdio.h>
 #include <util/delay.h>
+#include <stdbool.h>
 
 
 int serialPutChar(char c, FILE *stream);
 FILE uart_output = FDEV_SETUP_STREAM(serialPutChar, NULL, _FDEV_SETUP_WRITE);
-
-
-void setPinMode(int pin, IOMode mode) {
-/*
-    if(mode == OUTPUT) {
-        setMultiPinMode(pins[pin].port, *directionPorts[pins[pin].port] | pins[pin].pin);
-    } else {
-        setMultiPinMode(pins[pin].port, *directionPorts[pins[pin].port] & ~pins[pin].pin);
-    }
-*/
-}
-
-
-void setPin(int pin, IOBit mode) {
-/*
-    if(mode) {
-        setMultiPin(pins[pin].port, *dataPorts[pins[pin].port] | pins[pin].pin);
-    } else {
-        setMultiPin(pins[pin].port, *dataPorts[pins[pin].port] & ~pins[pin].pin);
-    }
-*/
-}
-
-int getPin(int pin) {
-    // return pins[pin].port & pins[pin].pin;
-    return 0;
-}
-
-void setMultiPinMode(Port port, int value) {
-    // *directionPorts[port] = value;
-}
-
-void setMultiPin(Port port, int value) {
-    // *dataPorts[port] = value;
-}
 
 void setupSerial() {
     UBRRH_def = UBRRH_VALUE;
@@ -70,16 +36,28 @@ int serialPutChar(char c, FILE *stream) {
     return 0;
 }
 
-int serialGetChar(FILE *stream) {
-    return 0;
+void alarmLED(bool on) {
+    if(on) {
+        ALARM_LED_PORT |= ALARM_LED_VALUE;
+    } else {
+        ALARM_LED_PORT &= ~ALARM_LED_VALUE;
+    }
 }
 
-void clearPort(Port port) {
-    // clearMultiPins(port, 0xFF);
+void pmLED(bool on) {
+    if(on) {
+        PM_LED_PORT |= PM_LED_VALUE;
+    } else {
+        PM_LED_PORT &= ~PM_LED_VALUE;
+    }
 }
 
-void clearMultiPins(Port port, int value) {
-    // *dataPorts[port] &= ~value;
+void buzzer(bool on) {
+    if(on) {
+        ALARM_BUZZER_PORT |= ALARM_BUZZER_VALUE;
+    } else {
+        ALARM_BUZZER_PORT &= ~ALARM_BUZZER_VALUE;
+    }
 }
 
 void setupArray() {
@@ -87,32 +65,24 @@ void setupArray() {
     LATCH2_DDR |= LATCH2_DDRMASK;
     clearArray();
     setArray(3, HIGH);
-/*
-    DEBUG_PRINT("Setting 0:\n");
-    setArray(0, HIGH);
-    DEBUG_PRINT("Setting 2:\n");
-    setArray(2, HIGH);
-    DEBUG_PRINT("Setting 9:\n");
-    setArray(9, HIGH);
-*/
 }
 
 void clearArray() {
-    LATCH2_PORT = LATCH2_CLEAR;
+    LATCH_PORT2 = LATCH2_CLEAR;
     _delay_us(1);
-    LATCH2_PORT = LATCH2_MEMORY;
+    LATCH_PORT2 = LATCH2_MEMORY;
     DEBUG_PRINT("Cleared\n");
 }
 
 void setArray(int value, IOMode mode) {
-    LATCH1_PORT = 0x04;
-    LATCH2_PORT = LATCH2_SET | 0x40;
+    LATCH_PORT1 = 0x04;
+    LATCH_PORT1 = LATCH2_SET | 0x40;
     _delay_us(5);
     // LATCH2_PORT = LATCH2_MEMORY;
     return;
     if(value > 7) {
         value = value - 8;
-        LATCH2_PORT = ~(LATCH2_SET | mode << 2 | value << 3);
+        LATCH_PORT2 = ~(LATCH2_SET | mode << 2 | value << 3);
 
 /*
         DEBUG_PRINT("LATCH2_SET: %i\n", LATCH2_SET);
@@ -122,9 +92,9 @@ void setArray(int value, IOMode mode) {
         
 */
         _delay_us(5);
-        LATCH2_PORT = ~LATCH2_MEMORY;
+        LATCH_PORT2 = ~LATCH2_MEMORY;
     } else {
-        LATCH1_PORT = ~(LATCH1_SET | mode << 2 | value << 3);
+        LATCH_PORT1 = ~(LATCH1_SET | mode << 2 | value << 3);
 /*
         DEBUG_PRINT("LATCH1_SET: %i\n", LATCH1_SET);
         DEBUG_PRINT("Mode: %i, Origional: %i\n", mode << 2, mode);
@@ -132,6 +102,6 @@ void setArray(int value, IOMode mode) {
         DEBUG_PRINT("Port: %i\n", LATCH1_PORT);
 */
         _delay_us(5);
-        LATCH1_PORT = ~LATCH1_MEMORY;
+        LATCH_PORT1 = ~LATCH1_MEMORY;
     }
 }

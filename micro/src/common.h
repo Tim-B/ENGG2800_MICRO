@@ -65,9 +65,9 @@
         #define UDRE_def UDRE0
         #define TIMSK_def TIMSK1
         #define F_CPU 8000000UL 
-        #define LATCH1_PORT PORTB
+        #define LATCH_PORT1 PORTB
         #define LATCH1_DDR DDRB
-        #define LATCH2_PORT PORTD
+        #define LATCH_PORT2 PORTD
         #define LATCH2_DDR DDRD
         #define LATCH1_MEMORY 0x03
         #define LATCH2_MEMORY 0x30
@@ -79,6 +79,17 @@
         #define EIMSK_def EIMSK
         #define LATCH1_DDRMASK 0x03
         #define LATCH2_DDRMASK 0xFE
+        #define ALARM_LED_PORT PORTC
+        #define ALARM_BUZZER_PORT PORTC
+        #define ALARM_LED_VALUE 0x10
+        #define ALARM_BUZZER_VALUE 0x02
+        #define PM_LED_VALUE 0x08
+        #define PM_LED_PORT PORTC
+        #define WEATHER_PORT PORTC
+        #define WEATHER_CLEAR_MASK 0x07
+        #define WEATHER_FINE 0x01
+        #define WEATHER_CLOUDY 0x02
+        #define WEATHER_RAINY 0x04
     #endif
 
     volatile int commandWaiting;

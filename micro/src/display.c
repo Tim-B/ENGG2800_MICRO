@@ -6,11 +6,13 @@
 
 int toggleLED = 0;
 IOBit toggleState = LOW;
+IOBit buzzerOn = LOW;
 
 void updateDisplay() {
     clearArray();
     setHourDisplay();
     setMinuteDisplay();
+    setPMDisplay();
     DEBUG_PRINT("Display time: %i:%i\n", getHour(), getMinute());
 }
 
@@ -25,7 +27,6 @@ void setMinuteDisplay() {
     if(pin < 0) {
         pin = 11;
     }
-    setPin(hourPins[pin], HIGH);
     setArray(pin, HIGH);
     DEBUG_PRINT("Minute pin: %i\n", pin);
     int minPin = getMinute() % 5;
@@ -35,17 +36,41 @@ void setMinuteDisplay() {
 }
 
 void toggle() {
-    //setArray(toggleLED, toggleState);
+    setArray(toggleLED, toggleState);
+    if(buzzerOn) {
+        buzzer(toggleState);
+    } else {
+        buzzer(LOW);
+    }
     DEBUG_PRINT("Toggle LED: %i\n", toggleLED);
     if(toggleState) {
-        PORTD = 0xFF;
+        // PORTD = 0xFF;
         toggleState = LOW;
     } else {
-        PORTD = 0x00;
+        // PORTD = 0x00;
         toggleState = HIGH;
     }
 }
 
+void setBuzzerOn(IOBit value) {
+    buzzerOn = value;
+}
+
 void setPMDisplay() {
-    
+    pmLED(isPM());
+}
+
+void updateWeather(Weather value) {
+    WEATHER_PORT &= ~WEATHER_CLEAR_MASK;
+    switch(value) {
+        case SUNNY:
+           WEATHER_PORT |= WEATHER_FINE;
+           break;
+        case CLOUDY:
+            WEATHER_PORT |= WEATHER_CLOUDY;
+            break;
+        default:
+            WEATHER_PORT |= WEATHER_RAINY;
+            break;
+    }
 }

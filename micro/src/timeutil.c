@@ -7,10 +7,13 @@
 
 uint32_t time = 0;
 uint32_t nextUpdate = 0;
+uint32_t alarmTime = 0;
 
 uint8_t seconds = 0;
 uint8_t minutes = 0;
 uint8_t hours = 0;
+uint8_t alarmOn = 0;
+Weather weatherValue = SUNNY;
 
 volatile uint8_t tot_overflow;
 void refresh();
@@ -19,8 +22,8 @@ void setupClock() {
 
     sei();
     TIMSK_def = 0x01;
-    TCNT0 = 0x0BDC;
-    TCCR1B = 0x04;
+    TCNT0 = (unsigned char) 0x0BDC;
+    TCCR1B = (unsigned char) 0x04;
 
     setTime(36840);
     refresh();
@@ -33,7 +36,7 @@ void setupClock() {
 
 
 ISR(TIMER1_OVF_vect) {
-    TCNT0 = 0x0BDC;
+    TCNT0 = (unsigned char) 0x0BDC;
     time++;
     DEBUG_PRINT("Time: %lu\n", time);
     if(time >= 86400) {
@@ -43,7 +46,14 @@ ISR(TIMER1_OVF_vect) {
         refresh();
     }
     toggle();
-    // PORTD = ~PORTD;
+}
+
+void checkAlarm() {
+    if(alarmOn && (alarmTime == time)) {
+        setBuzzerOn(HIGH);
+    } else {
+        setBuzzerOn(LOW);
+    }
 }
 
 void refresh() {
@@ -55,6 +65,7 @@ void refresh() {
     hours = breakTime;
     updateDisplay();
     nextUpdate = time + 60;
+    checkAlarm();
 }
 
 uint8_t getHour() {
@@ -74,7 +85,12 @@ uint8_t getSecond() {
 }
 
 uint8_t isPM() {
-    return hours % 12;
+    return hours / 12;
+}
+
+
+uint8_t alarmActive() {
+    return alarmOn;
 }
 
 void setTime(uint32_t newTime) {

@@ -8,6 +8,7 @@
 #ifndef INOUT_H
     #define INOUT_H
     #include <stdio.h>
+    #include <stdbool.h>
     #include "pins.h"
     #define RX_BUFSIZE 80
     #define UART_BAUD  9600
@@ -21,13 +22,6 @@
         INPUT = 0x00,
         OUTPUT = 0xFF,
     } IOMode;
-
-    void setPinMode(int, IOMode);
-    void setPin(int, IOBit);
-    int getPin(int);
-
-    void setMultiPinMode(Port, int);
-    void setMultiPin(Port, int);
     
     void setupSerial();
     
@@ -37,6 +31,10 @@
     void setupArray();
     void clearArray();
     void setArray(int, IOMode);
+    
+    void alarmLED(bool on);
+    void buzzer(bool on);
+    void pmLED(bool on);
     
 #endif	/* INOUT_H */
 

@@ -6,6 +6,7 @@
     void setMinuteDisplay();
     void setPMDisplay();
     void toggle();
+    void setBuzzerOn(IOBit value);
     
 #endif	/* INOUT_H */
 

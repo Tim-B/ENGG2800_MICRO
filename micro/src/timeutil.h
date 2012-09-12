@@ -14,7 +14,14 @@ uint8_t get24Hour();
 uint8_t getMinute();
 uint8_t getSecond();
 uint8_t isPM();
+uint8_t alarmActive();
 void setTime(uint32_t);
+
+typedef enum {
+    SUNNY = 0,
+    CLOUDY = 1,
+    RAINY = 2
+} Weather;
 
 #endif	/* TIMEUTIL_H */
 
