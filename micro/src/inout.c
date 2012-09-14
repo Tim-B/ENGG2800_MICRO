@@ -68,40 +68,39 @@ void setupArray() {
 }
 
 void clearArray() {
-    LATCH_PORT2 = LATCH2_CLEAR;
+    // Long, but make sure the bits are set correctly
+    LATCH_PORT1 = (LATCH_PORT1 & ~LATCH1_CLEAR) | LATCH1_CLEAR;
+    LATCH_PORT2 = (LATCH_PORT2 & ~LATCH2_CLEAR) | LATCH2_CLEAR;
     _delay_us(1);
-    LATCH_PORT2 = LATCH2_MEMORY;
+    LATCH_PORT1 |= LATCH1_MEMORY;
+    LATCH_PORT2 |= LATCH2_MEMORY;
     DEBUG_PRINT("Cleared\n");
 }
 
 void setArray(int value, IOMode mode) {
-    LATCH_PORT1 = 0x04;
-    LATCH_PORT1 = LATCH2_SET | 0x40;
-    _delay_us(5);
-    // LATCH2_PORT = LATCH2_MEMORY;
-    return;
+    int secondLatch = 0;
     if(value > 7) {
         value = value - 8;
-        LATCH_PORT2 = ~(LATCH2_SET | mode << 2 | value << 3);
-
-/*
-        DEBUG_PRINT("LATCH2_SET: %i\n", LATCH2_SET);
-        DEBUG_PRINT("Mode: %i, Origional: %i\n", mode << 2, mode);
-        DEBUG_PRINT("Value: %i, Origional: %i\n", value << 3, value);
-        DEBUG_PRINT("Port: %i\n", LATCH2_PORT);
-        
-*/
-        _delay_us(5);
-        LATCH_PORT2 = ~LATCH2_MEMORY;
-    } else {
-        LATCH_PORT1 = ~(LATCH1_SET | mode << 2 | value << 3);
-/*
-        DEBUG_PRINT("LATCH1_SET: %i\n", LATCH1_SET);
-        DEBUG_PRINT("Mode: %i, Origional: %i\n", mode << 2, mode);
-        DEBUG_PRINT("Value: %i, Origional: %i\n", value << 3, value);
-        DEBUG_PRINT("Port: %i\n", LATCH1_PORT);
-*/
-        _delay_us(5);
-        LATCH_PORT1 = ~LATCH1_MEMORY;
+        secondLatch = 1;
     }
+    value = value & 0x07;
+    // Make sure address lines are clear then set them
+    LATCH_PORT1 = (LATCH_PORT1 & 0xF8) | value;
+    if(mode) {
+        LATCH_PORT2 |= 0x40;
+    } else {
+        LATCH_PORT2 &= ~0x40;
+    }
+    // Put the latch into write mode
+    if(secondLatch) {
+        LATCH_PORT2 = (LATCH_PORT2 & ~LATCH2_SET) | LATCH2_SET;
+    } else {
+        LATCH_PORT1 = (LATCH_PORT1 & ~LATCH1_SET) | LATCH1_SET;
+    }
+    _delay_us(1);
+    // Back to memory mode!
+    LATCH_PORT1 |= LATCH1_MEMORY;
+    LATCH_PORT2 |= LATCH2_MEMORY;
+    
+    DEBUG_PRINT("Latch set: value %i, mode %i\n", value, mode);
 }

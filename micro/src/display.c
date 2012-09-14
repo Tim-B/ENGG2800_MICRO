@@ -44,10 +44,8 @@ void toggle() {
     }
     DEBUG_PRINT("Toggle LED: %i\n", toggleLED);
     if(toggleState) {
-        // PORTD = 0xFF;
         toggleState = LOW;
     } else {
-        // PORTD = 0x00;
         toggleState = HIGH;
     }
 }
