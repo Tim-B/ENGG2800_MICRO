@@ -25,7 +25,7 @@ void setupClock() {
     TCNT0 = (unsigned char) 0x0BDC;
     TCCR1B = (unsigned char) 0x04;
 
-    setTime(36840);
+    setTime(12120);
     refresh();
 /*
     TIMSK1 |= (1 << TOIE1);
