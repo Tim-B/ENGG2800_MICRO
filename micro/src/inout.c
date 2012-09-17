@@ -52,16 +52,18 @@ void pmLED(bool on) {
     }
 }
 
-void buzzer(bool on) {
-    if(on) {
+void buzzer(IOBit on) {
+    if(on == HIGH) {
         ALARM_BUZZER_PORT |= ALARM_BUZZER_VALUE;
+        DEBUG_PRINT("Buzzer on\n");
     } else {
         ALARM_BUZZER_PORT &= ~ALARM_BUZZER_VALUE;
+        DEBUG_PRINT("Buzzer off\n");
     }
 }
 
 void setupArray() {
-    
+    DDRC |= ALARM_BUZZER_VALUE;
     latchAddressTranslate[0] = 5;
     latchAddressTranslate[1] = 7;
     latchAddressTranslate[2] = 12;

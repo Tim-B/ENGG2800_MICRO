@@ -15,22 +15,24 @@ int count = 0;
 void setup() {
     setupSerial();
     setupPins(); 
-    setupClock();
     setupArray();
+    setupClock();
     // setArray(0, HIGH);
 }
 
 void loop() {
+/*
     if(commandWaiting) {
         // readCommand();
     }
-    // clearArray();
+    clearArray();
     // setArray(10, HIGH);
-    // setArray(step++, HIGH);
+    setArray(step++, HIGH);
     // setArray(1, HIGH);
-    // if(step == 16) {
-    //    step = 0;
-    // }
-    // _delay_ms(1000);
+    if(step == 16) {
+        step = 0;
+    }
+    _delay_ms(1000);
+*/
 
 }

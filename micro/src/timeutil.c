@@ -12,7 +12,7 @@ uint32_t alarmTime = 0;
 uint8_t seconds = 0;
 uint8_t minutes = 0;
 uint8_t hours = 0;
-uint8_t alarmOn = 0;
+uint8_t alarmOn = 1;
 Weather weatherValue = SUNNY;
 
 volatile uint8_t tot_overflow;
@@ -25,8 +25,10 @@ void setupClock() {
     TCNT0 = (unsigned char) 0x0BDC;
     TCCR1B = (unsigned char) 0x04;
 
-    setTime(12120);
+    setTime(11520);
+    alarmTime = 11580;
     refresh();
+    updateDisplay();
 /*
     TIMSK1 |= (1 << TOIE1);
     TCCR1B |= (1 << CS11);

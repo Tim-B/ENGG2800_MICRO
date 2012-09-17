@@ -35,7 +35,7 @@
     void setArray(int, IOMode);
     
     void alarmLED(bool on);
-    void buzzer(bool on);
+    void buzzer(IOBit on);
     void pmLED(bool on);
     
 #endif	/* INOUT_H */

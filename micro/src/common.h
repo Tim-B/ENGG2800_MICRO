@@ -81,7 +81,7 @@
         #define LATCH2_DDRMASK 0xE0
         #define ALARM_LED_PORT PORTC
         #define ALARM_BUZZER_PORT PORTC
-        #define ALARM_LED_VALUE 0x210
+        #define ALARM_LED_VALUE 0x10
         #define ALARM_BUZZER_VALUE 0x20
         #define PM_LED_VALUE 0x08
         #define PM_LED_PORT PORTC
