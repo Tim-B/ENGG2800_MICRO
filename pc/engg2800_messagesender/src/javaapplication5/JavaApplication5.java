@@ -68,7 +68,6 @@ public class JavaApplication5 extends JFrame {
         char[] mnemonics = { 'F', 'M', 'L', 'A' };
         int[] widths = { 3 , 3, 3, 3 };
         String[] descs = { "addlater", "add later", "add later", "add later" };
-
         final TextForm form = new TextForm(labels, mnemonics, widths, descs);
         controlArea.add(form);
         JCheckBox weatherCheck = new JCheckBox("Set Weather");
@@ -124,16 +123,15 @@ public class JavaApplication5 extends JFrame {
     }
     
 
-    public void changeColor(ArrayList<Integer> message, int rate, JPanel panel, Color high, Color low) {
+    public void changeColor(ArrayList<Integer> message, int rate, JPanel panel, Color high, Color low){
         for(int i: message) {
             if(i == 1) {
                 panel.setBackground(high);
-                System.out.print("Out: 1");
-
-   
+                System.out.print("1");
+                
             } else {
                panel.setBackground(low);
-               System.out.print("Out: 0");
+               System.out.print("0");
             }
             try {
                 Thread.sleep(rate);
@@ -141,6 +139,7 @@ public class JavaApplication5 extends JFrame {
                 Logger.getLogger(JavaApplication5.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        System.out.print("\n");
     }
     
     public ArrayList<Integer> addFlags(Boolean setWeather, 
