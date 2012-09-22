@@ -26,7 +26,8 @@ public class JavaApplication5 extends JFrame {
     //literals for testing here
     
     private static final int RATE = 100;
-    private static final int WORDLENGTH = 5;
+    private static final int WORDLENGTH = 8;
+    private static final int LONGLENGTH = WORDLENGTH * 2;
     private static final int CLEARWEATHER = 0;
     private static final int CLOUDYWEATHER = 1;
     private static final int RAINYWEATHER = 2;
@@ -63,7 +64,7 @@ public class JavaApplication5 extends JFrame {
         String[] labels = { "Alarm Hour", "Alarm Minute", 
             "Clock Hour", "Clock Minute" };
         char[] mnemonics = { 'F', 'M', 'L', 'A' };
-        int[] widths = { 3, 3, 3, 3 };
+        int[] widths = { 3 , 3, 3, 3 };
         String[] descs = { "addlater", "add later", "add later", "add later" };
 
         final TextForm form = new TextForm(labels, mnemonics, widths, descs);
@@ -85,13 +86,20 @@ public class JavaApplication5 extends JFrame {
         pack();
         setVisible(true);
         final ArrayList<Integer> list = new ArrayList();
+        final ArrayList<Integer> startSequence = new ArrayList();
+        startSequence.add(0);
+        startSequence.add(1);
+        startSequence.add(0);
+        startSequence.add(0);
+        startSequence.add(1);
+        startSequence.add(1);
+        startSequence.add(0);
+        startSequence.add(1);
         submit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Integer> temporaryList = new ArrayList();
-                temporaryList.addAll(form.getBinary(ALARMHOURTEXT, WORDLENGTH));
-                temporaryList.addAll(form.getBinary(ALARMMINUTETEXT, WORDLENGTH));
-                temporaryList.addAll(form.getBinary(CLOCKHOURTEXT, WORDLENGTH));
-                temporaryList.addAll(form.getBinary(CLOCKMINUTETEXT, WORDLENGTH));
+                temporaryList.addAll(form.getBinary(ALARMHOURTEXT, ALARMMINUTETEXT, WORDLENGTH));
+                temporaryList.addAll(form.getBinary(CLOCKHOURTEXT, CLOCKMINUTETEXT, WORDLENGTH));
                 list.addAll(temporaryList);
                 System.out.println(list.toString());
             }
@@ -101,18 +109,23 @@ public class JavaApplication5 extends JFrame {
             int forecast = getForecast();
             list.addAll(addFlags(weatherCheck.isSelected(), alarmCheck.isSelected()
                 , timeCheck.isSelected(), forecast));
-            changeColor(list, RATE, drawingArea);
+            changeColor(startSequence, RATE, drawingArea, HIGHCOLOR, LOWCOLOR);
+            changeColor(list, RATE, drawingArea, HIGHCOLOR, LOWCOLOR);
+            changeColor(list, RATE, drawingArea, LOWCOLOR, HIGHCOLOR);
+            changeColor(startSequence, RATE, drawingArea, LOWCOLOR, HIGHCOLOR);
             list.removeAll(list);
-            JOptionPane.showMessageDialog(null, "Programmed!");
+            
         }
     }
     
-    public void changeColor(ArrayList<Integer> message, int rate, JPanel panel) {
+    public void changeColor(ArrayList<Integer> message, int rate, JPanel panel, Color high, Color low) {
         for(int i: message) {
             if(i == 1) {
-                panel.setBackground(HIGHCOLOR);
+                panel.setBackground(high);
+                System.out.print("Out: 1");
             } else {
-               panel.setBackground(LOWCOLOR);
+               panel.setBackground(low);
+               System.out.print("Out: 0");
             }
             try {
                 Thread.sleep(rate);
