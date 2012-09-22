@@ -25,9 +25,11 @@ public class JavaApplication5 extends JFrame {
     
     //literals for testing here
     
+
     private static final int RATE = 100;
     private static final int WORDLENGTH = 8;
     private static final int LONGLENGTH = WORDLENGTH * 2;
+
     private static final int CLEARWEATHER = 0;
     private static final int CLOUDYWEATHER = 1;
     private static final int RAINYWEATHER = 2;
@@ -105,7 +107,10 @@ public class JavaApplication5 extends JFrame {
             }
         });
         while(true){
-            while(list.isEmpty());
+            while(list.isEmpty()) {
+                Thread.sleep(0);
+            }
+
             int forecast = getForecast();
             list.addAll(addFlags(weatherCheck.isSelected(), alarmCheck.isSelected()
                 , timeCheck.isSelected(), forecast));
@@ -118,11 +123,14 @@ public class JavaApplication5 extends JFrame {
         }
     }
     
+
     public void changeColor(ArrayList<Integer> message, int rate, JPanel panel, Color high, Color low) {
         for(int i: message) {
             if(i == 1) {
                 panel.setBackground(high);
                 System.out.print("Out: 1");
+
+   
             } else {
                panel.setBackground(low);
                System.out.print("Out: 0");
