@@ -11,9 +11,11 @@
 
 int step = 0;
 char* string;
+int count = 0;
 void setup() {
     setupSerial();
     setupPins(); 
+    setupArray();
     setupClock();
     setupControl();
 }
