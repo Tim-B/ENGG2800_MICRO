@@ -46,15 +46,23 @@ class TextForm extends JPanel {
         }
     }
     
-    public ArrayList<Integer> getBinary(int i, int wordLength) {
+    public ArrayList<Integer> getBinary(int hour, int minute, int wordLength) {
         ArrayList<Integer> list = new ArrayList();
-          int number;
-          if(fields[i].getText().equals("")) {
-              number = 0;
+          int hourInt;
+          int minuteInt;
+          if(fields[hour].getText().equals("")) {
+              hourInt = 0;
           } else {
-              number = Integer.parseInt(fields[i].getText());
+              hourInt = Integer.parseInt(fields[hour].getText());
           }
-          String binary = Integer.toBinaryString(number);
+          if(fields[hour].getText().equals("")) {
+              minuteInt = 0;
+          } else {
+              minuteInt = Integer.parseInt(fields[hour].getText());
+          }
+          int timeStamp = hourInt * 60 * 60 + minuteInt * 60;
+          System.out.println("The timestamp is " + timeStamp);
+          String binary = Integer.toBinaryString(timeStamp);
           System.out.println(binary);
           char charArray[] = binary.toCharArray();
           int count = wordLength - charArray.length;

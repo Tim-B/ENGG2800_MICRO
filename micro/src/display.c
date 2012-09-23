@@ -6,8 +6,7 @@
 
 int toggleLED = 0;
 IOBit toggleState = LOW;
-IOBit buzzerOn = HIGH;
-int alarmCount = 0;
+IOBit buzzerOn = LOW;
 
 void updateDisplay() {
     clearArray();
@@ -38,26 +37,23 @@ void setMinuteDisplay() {
 
 void toggle() {
     setArray(toggleLED, toggleState);
-    if(buzzerOn == HIGH) {
+    if(buzzerOn) {
         buzzer(toggleState);
-        DEBUG_PRINT("Alarm count %i\n", alarmCount);
-        alarmCount++;
-        if(alarmCount > 10) {
-            buzzerOn = LOW;
-            buzzer(LOW);
-        }
+    } else {
+        buzzer(LOW);
     }
     DEBUG_PRINT("Toggle LED: %i\n", toggleLED);
     if(toggleState) {
+        // PORTD = 0xFF;
         toggleState = LOW;
     } else {
+        // PORTD = 0x00;
         toggleState = HIGH;
     }
 }
 
 void setBuzzerOn(IOBit value) {
     buzzerOn = value;
-    alarmCount = 0;
 }
 
 void setPMDisplay() {

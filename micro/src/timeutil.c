@@ -23,13 +23,10 @@ void setupClock() {
     sei();
     TIMSK_def = 0x01;
     TCNT0 = (unsigned char) 0x0BDC;
-    // TCCR1B = (unsigned char) 0x04;
     TCCR1B = (unsigned char) 0x04;
 
-    setTime(11520);
-    alarmTime = 11580;
+    setTime(36840);
     refresh();
-    updateDisplay();
 /*
     TIMSK1 |= (1 << TOIE1);
     TCCR1B |= (1 << CS11);
@@ -40,7 +37,7 @@ void setupClock() {
 
 ISR(TIMER1_OVF_vect) {
     TCNT0 = (unsigned char) 0x0BDC;
-    time = time + 2;
+    time++;
     DEBUG_PRINT("Time: %lu\n", time);
     if(time >= 86400) {
         time = 0;
