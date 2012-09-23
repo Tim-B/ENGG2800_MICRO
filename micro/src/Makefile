@@ -1,6 +1,6 @@
 # AVR-GCC Makefile
 PROJECT=engg2800_micro
-SOURCES=main.c common.c display.c inout.c timeutil.c
+SOURCES=main.c common.c display.c inout.c timeutil.c control.c
 PIN_DEF=arduino_pins.c
 CC=avr-gcc
 OBJCOPY=avr-objcopy

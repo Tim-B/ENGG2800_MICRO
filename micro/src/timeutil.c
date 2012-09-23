@@ -12,7 +12,7 @@ uint32_t alarmTime = 0;
 uint8_t seconds = 0;
 uint8_t minutes = 0;
 uint8_t hours = 0;
-uint8_t alarmOn = 1;
+uint8_t alarmOn = 0;
 Weather weatherValue = SUNNY;
 
 volatile uint8_t tot_overflow;
@@ -98,4 +98,17 @@ uint8_t alarmActive() {
 
 void setTime(uint32_t newTime) {
     time = newTime;
+}
+
+
+void setAlarm(uint32_t newTime) {
+    alarmTime = newTime;
+}
+
+void setAlarmActive(uint8_t value) {
+    alarmOn = value;
+}
+
+void setWeather(Weather value) {
+    weatherValue = value;
 }

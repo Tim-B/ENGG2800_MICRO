@@ -5,6 +5,13 @@
  * Created on 7 August 2012, 6:08 PM
  */
 
+typedef enum {
+    NONE = 0,
+    SUNNY = 1,
+    CLOUDY = 2,
+    RAINY = 3
+} Weather;
+
 #ifndef TIMEUTIL_H
 #define	TIMEUTIL_H
 void setupClock();
@@ -15,13 +22,10 @@ uint8_t getMinute();
 uint8_t getSecond();
 uint8_t isPM();
 uint8_t alarmActive();
+void setAlarmActive(uint8_t value);
 void setTime(uint32_t);
-
-typedef enum {
-    SUNNY = 0,
-    CLOUDY = 1,
-    RAINY = 2
-} Weather;
+void setWeather(Weather);
+void setAlarm(uint32_t);
 
 #endif	/* TIMEUTIL_H */
 

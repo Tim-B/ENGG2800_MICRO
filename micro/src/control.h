@@ -10,5 +10,11 @@
 
     void setupControl();
     void readCommand();
+    int readPCWord();
+    void programFailed();
+    void programSuccess();
+    int readPCBit();
+    void disablePCInt();
+    void enablePCInt();
 
 #endif	/* TCONTROL_H */

@@ -77,6 +77,11 @@
         #define LATCH2_SET 0x80
         #define EICR_def EICRA
         #define EIMSK_def EIMSK
+        #define EICR_value 0x05
+        #define EIMSK_IR_VALUE 0x01
+        #define EIMSK_OPTIC_VALUE 0x02
+        #define SENSOR_PIN PIND
+        #define SENSOR_OPTICAL_MASK 0x08
         #define LATCH1_DDRMASK 0x37
         #define LATCH2_DDRMASK 0xE0
         #define ALARM_LED_PORT PORTC
@@ -90,6 +95,8 @@
         #define WEATHER_FINE 0x01
         #define WEATHER_CLOUDY 0x02
         #define WEATHER_RAINY 0x04
+        #define SENSOR_PORT PORTD
+        #define SENSOR_DDR_MASK 0x0C
     #endif
 
     volatile int commandWaiting;
