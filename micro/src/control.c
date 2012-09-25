@@ -2,25 +2,79 @@
 #include "common.h"
 #include "inout.h"
 #include "timeutil.h"
+#include <stdbool.h>
 #include <avr/interrupt.h>  
 #include <util/delay.h>
 #define PC_RATE 80
 #define PC_SAMPLE 10
+#define TIME_PROGRESS_CODE 254
+#define ALARM_PROGRESS_CODE 253
+#define INCREMENT_CODE 252
+#define TOGGLE_ALARM 251
+
+bool programmingActive = false;
+int tmpValue = 0;
+Stage stage = NONE;
 
 void setupControl() {
     commandWaiting = 0;
     SENSOR_PORT &= ~SENSOR_DDR_MASK;
     EICR_def |= EICR_value;
-    EIMSK_def |= EIMSK_IR_VALUE | EIMSK_OPTIC_VALUE;
+    enablePCInt();
+    enableIRInt();
     DEBUG_PRINT("interrupt setup\n");
     sei();
 }
 
 ISR(INT0_vect) {
-    if(commandWaiting) {
-        return;
+    disableIRInt();
+    int code = readCommand();
+    switch(code) {
+        case TOGGLE_ALARM:
+            processToggleAlarm();
+            break;
+        case INCREMENT_CODE:
+            processIncrement();
+            break;
+        case TIME_PROGRESS_CODE:
+            processProgressTime();
+            break;
+        case ALARM_PROGRESS_CODE:
+            processProgressAlarm();
+            break;
     }
-    commandWaiting = 1;
+    enableIRInt();
+}
+
+void processIncrement() {
+    tmpValue++;
+    int displayValue = 0;
+    switch(stage) {
+        case TIME_INNER_MINUTE:
+            if(tmpValue > 4) {
+                tmpValue = 0;
+            }
+            displayValue = tmpValue + 12;
+            break;
+        case TIME_OUTER_MINUTE:
+            if(tmpValue > 12) {
+                tmpValue = 0;
+            }
+            displayValue = tmpValue;
+            break;
+    }
+}
+
+void processToggleAlarm() {
+    
+}
+
+void processProgressTime() {
+    
+}
+
+void processProgressAlarm() {
+    
 }
 
 ISR(INT1_vect) {
@@ -151,7 +205,17 @@ void enablePCInt() {
     DEBUG_PRINT("PC Int enabled\n");
 }
 
-void readCommand() {
+void disableIRInt() {
+    EIMSK_def &= ~EIMSK_IR_VALUE;
+    DEBUG_PRINT("IRInt disabled\n");
+}
+
+void enableIRInt() {
+    EIMSK_def |= EIMSK_IR_VALUE;
+    DEBUG_PRINT("IR Int enabled\n");
+}
+
+int readCommand() {
     int command = 0;
     int highCount = 0;
     int i, k;
@@ -167,13 +231,8 @@ void readCommand() {
             command |= 1 << i;
         }
     }
-    if(command == 157) {
-        setArray(2, HIGH);
-    }
-    if(command == 137) {
-        clearArray();
-    }
+    
     DEBUG_PRINT("%i\n", command);
-    _delay_ms(3000);
-    commandWaiting = 0;
+    _delay_ms(1000);
+    return command;
 }
