@@ -20,8 +20,4 @@ void setup() {
     setupControl();
 }
 
-void loop() {
-    if(commandWaiting) {
-        readCommand();
-    }
-}
+void loop() {}

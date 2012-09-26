@@ -2,6 +2,7 @@
 #include "common.h"
 #include "inout.h"
 #include "timeutil.h"
+#include "display.h"
 #include <stdbool.h>
 #include <avr/interrupt.h>  
 #include <util/delay.h>
@@ -14,7 +15,8 @@
 
 bool programmingActive = false;
 int tmpValue = 0;
-Stage stage = NONE;
+Stage stage = NO_COMMAND;
+uint32_t newTime = 0;
 
 void setupControl() {
     commandWaiting = 0;
@@ -48,33 +50,131 @@ ISR(INT0_vect) {
 
 void processIncrement() {
     tmpValue++;
-    int displayValue = 0;
     switch(stage) {
+        case NO_COMMAND:
+            return;
+            break;
         case TIME_INNER_MINUTE:
-            if(tmpValue > 4) {
-                tmpValue = 0;
-            }
-            displayValue = tmpValue + 12;
+            incrementInner();
             break;
         case TIME_OUTER_MINUTE:
-            if(tmpValue > 12) {
-                tmpValue = 0;
-            }
-            displayValue = tmpValue;
+            incrementOuter();
             break;
+        case TIME_HOUR:
+            incrementOuter();
+            break;
+        case TIME_PM:
+            incrementPM();
+            break;
+        case ALARM_INNER_MINUTE:
+            incrementInner();
+            break;
+        case ALARM_OUTER_MINUTE:
+            incrementOuter();
+            break;
+        case ALARM_HOUR:
+            incrementOuter();
+        case ALARM_PM:
+            incrementPM();
     }
 }
 
-void processToggleAlarm() {
+void incrementInner() {
+    if(tmpValue > 4) {
+        tmpValue = 0;
+    }
+    displayVal(tmpValue + 12);
+}
+
+void incrementOuter() {
+    if(tmpValue > 12) {
+        tmpValue = 0;
+    }
+    displayVal(tmpValue);
     
+}
+
+void displayVal(int value) {
+    clearArray();
+    setArray(value, HIGH);
+}
+
+void incrementPM() {
+    
+}
+
+void processToggleAlarm() {
+
 }
 
 void processProgressTime() {
-    
+    switch(stage) {
+        case NO_COMMAND:
+            stage = TIME_INNER_MINUTE;
+            newTime = 0;
+            tmpValue = 0;
+            displayVal(0);
+            break;
+        case TIME_INNER_MINUTE:
+            stage = TIME_OUTER_MINUTE;
+            setNewTime(60);
+            break;
+        case TIME_OUTER_MINUTE:
+            stage = TIME_HOUR;
+            setNewTime(60 * 5);
+            break;
+        case TIME_HOUR:
+            stage = TIME_PM;
+            setNewTime(60 * 60);
+            break;
+        case TIME_PM:
+            stage = NO_COMMAND;
+            setTime(newTime);
+            updateDisplay();
+            break;
+        default:
+            break;
+    } 
+}
+
+void setNewTime(int mult) {
+    newTime += tmpValue * mult;
+    tmpValue = 0;
+    displayVal(0);
 }
 
 void processProgressAlarm() {
-    
+    switch(stage) {
+        case NO_COMMAND:
+            stage = ALARM_INNER_MINUTE;
+            newTime = 0;
+            tmpValue = 0;
+            displayVal(0);
+            break;
+        case ALARM_INNER_MINUTE:
+            stage = ALARM_OUTER_MINUTE;
+            setNewTime(60);
+            break;
+        case ALARM_OUTER_MINUTE:
+            stage = ALARM_HOUR;
+            setNewTime(60 * 5);
+            break;
+        case ALARM_HOUR:
+            stage = ALARM_PM;
+            setNewTime(60 * 60);
+            break;
+        case ALARM_PM:
+            stage = NO_COMMAND;
+            setAlarm(newTime);
+            updateDisplay();
+            break;
+        default:
+            break;
+    } 
+}
+
+bool isProgramming() {
+    return !(stage == NO_COMMAND);
 }
 
 ISR(INT1_vect) {
