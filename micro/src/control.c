@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <avr/interrupt.h>  
 #include <util/delay.h>
-#define PC_RATE 80
+#define PC_RATE 120
 #define PC_SAMPLE 10
 #define TIME_PROGRESS_CODE 254
 #define ALARM_PROGRESS_CODE 253
@@ -22,10 +22,18 @@ void setupControl() {
     commandWaiting = 0;
     SENSOR_PORT &= ~SENSOR_DDR_MASK;
     EICR_def |= EICR_value;
-    enablePCInt();
+    // enablePCInt();
+    EIMSK_def |= EIMSK_OPTIC_VALUE;
     enableIRInt();
+    DDRB |= 0x80;
     DEBUG_PRINT("interrupt setup\n");
-    sei();
+}
+
+void printArray(int *value, int total) {
+    int i;
+    for(i = 0; i < total; i++) {
+        DEBUG_PRINT("Value: %i\n", value[i]);
+    }
 }
 
 ISR(INT0_vect) {
@@ -179,45 +187,49 @@ bool isProgramming() {
 
 ISR(INT1_vect) {
     disablePCInt();
-    int startSequence = readPCWord();
-    if(!(startSequence == 0b01001101)) {
-        enablePCInt();
-        return;
-    }
-    int time1 = readPCWord();
-    int time2 = readPCWord();
-    int alarm1 = readPCWord();
-    int alarm2 = readPCWord();
-    int settings = readPCWord();
-    
-    if(readPCWord() != ~time1) {
+
+    if(!checkStart()) {
         programFailed();
         return;
     }
     
-    if(readPCWord() != ~time2) {
-        programFailed();
-        return;
+    uint8_t time1 = readPCWord();
+    uint8_t time2 = readPCWord();
+    uint8_t alarm1 = readPCWord();
+    uint8_t alarm2 = readPCWord();
+    uint8_t settings = readPCWord();
+    
+    uint8_t time1_check = readPCWord();
+    uint8_t time2_check = readPCWord();
+    uint8_t alarm1_check = readPCWord();
+    uint8_t alarm2_check = readPCWord();
+    uint8_t settings_check = readPCWord();
+    
+    uint8_t end_check = ~readPCWord();
+
+    if(time1_check != ~time1) {
+        // programFailed();
+        // return;
     }
     
-    if(readPCWord() != ~alarm1) {
-        programFailed();
-        return;
+    if(time2_check != ~time2) {
+        // programFailed();
+        // return;
     }
     
-    if(readPCWord() != ~alarm2) {
-        programFailed();
-        return;
+    if(alarm1_check != ~alarm1) {
+        // programFailed();
+        // return;
     }
     
-    if(readPCWord() != ~settings) {
-        programFailed();
-        return;
+    if(alarm2_check != ~alarm2) {
+        // programFailed();
+        // return;
     }
     
-    if(readPCWord() != ~0b01001101) {
-        programFailed();
-        return;
+    if(settings_check != ~settings) {
+        // programFailed();
+        // return;
     }
     
     uint32_t newTime = ((uint32_t) time1 << 8) | ((uint32_t) time2);
@@ -251,36 +263,62 @@ ISR(INT1_vect) {
             break;
     }
     
-    DEBUG_PRINT("Time: %lu", newTime);
-    DEBUG_PRINT("Alarm: %lu", newAlarm);
-    DEBUG_PRINT("Settings: %i", settings);
+    DEBUG_PRINT("Time1: %u, Time2: %u, Full: %lu\n", time1, time2, newTime);
+    DEBUG_PRINT("Alarm1: %u, Alarm2: %u, Full: %lu\n", alarm1, alarm2, newAlarm);
+    DEBUG_PRINT("Settings: %u\n", settings);
+    
+    DEBUG_PRINT("Check Time1: %u, Time2: %u\n", time1_check, time2_check);
+    DEBUG_PRINT("Check Alarm1: %u, Alarm2: %u\n", alarm1_check, alarm2_check);
+    DEBUG_PRINT("Check Settings: %u\n", settings_check);
     
     programSuccess();
 }
 
-int readPCWord() {
+bool checkStart() {
     int output = 0;
     int i;
+    int tmpBit;
     for(i = 0; i < 8; i++) {
-        output |= readPCBit() << i;
+        tmpBit = readPCBit();
+        output = output << 1;
+        output |= tmpBit;
+        if((output & 0b00111111) == 0b00101010) {
+            // DEBUG_PRINT("Start match: %i\n", output);
+            return true;
+        }
+    }
+    // DEBUG_PRINT("Start false match: %i\n", output);
+    return false;  
+}
+
+uint8_t readPCWord() {
+    uint8_t output = 0;
+    int i;
+    uint8_t tmpBit;
+    for(i = 0; i < 8; i++) {
+        tmpBit = readPCBit();
+        output = output << 1;
+        output |= tmpBit;
     }
     return output;
 }
 
 void programFailed() {
     enablePCInt();
-    DEBUG_PRINT("Programming failed\n");
+    // DEBUG_PRINT("Programming failed\n");
 }
 
 void programSuccess() {
     enablePCInt();
-    DEBUG_PRINT("Programming success\n");
+    // DEBUG_PRINT("Programming success\n");
 }
 
 int readPCBit() {
     int avgCount = 0;
     int value = 0;
     int i;
+    // _delay_ms(24);
+    _delay_ms(20);
     for(i = 0; i < 8; i++) {
         value = SENSOR_PIN & SENSOR_OPTICAL_MASK;
         if(value) {
@@ -288,21 +326,24 @@ int readPCBit() {
         }
         _delay_ms(PC_SAMPLE);
     }
+    _delay_ms(20);
     if(avgCount > 4) {
-        return 1;
+        return 0; 
     } else {
-        return 0;
+        return 1;
     }
 }
 
 void disablePCInt() {
-    EIMSK_def &= ~EIMSK_OPTIC_VALUE;
-    DEBUG_PRINT("PC Int disabled\n");
+    PORTB |= 0x80;
+    // EIMSK_def &= ~EIMSK_OPTIC_VALUE;
+    // DEBUG_PRINT("PC Int disabled\n");
 }
 
 void enablePCInt() {
-    EIMSK_def |= EIMSK_OPTIC_VALUE;
-    DEBUG_PRINT("PC Int enabled\n");
+    PORTB &= ~0x80;
+    // EIMSK_def |= EIMSK_OPTIC_VALUE;
+    // DEBUG_PRINT("PC Int enabled\n");
 }
 
 void disableIRInt() {

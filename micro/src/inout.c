@@ -64,6 +64,8 @@ void buzzer(IOBit on) {
 
 void setupArray() {
     DDRC |= ALARM_BUZZER_VALUE;
+    DDRC |= ALARM_LED_VALUE;
+    DDRC |= PM_LED_VALUE;
     latchAddressTranslate[0] = 5;
     latchAddressTranslate[1] = 7;
     latchAddressTranslate[2] = 12;

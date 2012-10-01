@@ -4,13 +4,13 @@
  *
  * Created on 7 August 2012, 6:08 PM
  */
-
+#include <stdio.h>
 #ifndef TCONTROL_H
     #define TCONTROL_H
     #include <stdbool.h>
     void setupControl();
     int readCommand();
-    int readPCWord();
+    uint8_t readPCWord();
     void programFailed();
     void programSuccess();
     int readPCBit();
@@ -28,6 +28,7 @@
     void displayVal(int value);
     void setNewTime();
     bool isProgramming();
+    bool checkStart();
     
     typedef enum {
         NO_COMMAND = 0,

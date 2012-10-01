@@ -20,7 +20,6 @@ void refresh();
 
 void setupClock() {
 
-    sei();
     TIMSK_def = 0x01;
     TCNT0 = (unsigned char) 0x0BDC;
     // TCCR1B = (unsigned char) 0x04;

@@ -14,21 +14,17 @@ char* string;
 int count = 0;
 int old = 0;
 void setup() {
-    DDRE = 0x00;
+    // DDRE = 0x00;
+    // setupSerial();
+    // setupPins(); 
+    // DEBUG_PRINT("START\n");
     setupSerial();
     setupPins(); 
-    DEBUG_PRINT("START\n");
-/*
-    
-    setupPins(); 
     setupArray();
-    setupClock();
+    // setupClock();
     setupControl();
-*/
+    sei();
+    DEBUG_PRINT("START\n");
 }
 
-void loop() {
-    int new = PINE & 0x10;
-    DEBUG_PRINT("Changed: %i\n", new);
-    _delay_ms(1000);
-}
+void loop() {}
