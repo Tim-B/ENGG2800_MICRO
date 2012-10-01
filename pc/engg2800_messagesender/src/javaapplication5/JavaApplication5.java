@@ -26,7 +26,7 @@ public class JavaApplication5 extends JFrame {
     //literals for testing here
     
 
-    private static final int RATE = 80;
+    private static final int RATE = 120;
     private static final int WORDLENGTH = 8;
     private static final int LONGLENGTH = WORDLENGTH * 2;
 
@@ -43,8 +43,8 @@ public class JavaApplication5 extends JFrame {
     private static final 
             String WEATHERURL = "http://api.wunderground.com/api/ee6756280a23f6e9/forecast/q/YBBN.xml";
     
-    private static final Color HIGHCOLOR = Color.BLACK;
-    private static final Color LOWCOLOR = Color.WHITE;
+    private static final Color HIGHCOLOR = Color.WHITE;
+    private static final Color LOWCOLOR = Color.BLACK;
     
     
     
@@ -92,12 +92,12 @@ public class JavaApplication5 extends JFrame {
         final ArrayList<Integer> startSequence = new ArrayList();
         startSequence.add(0);
         startSequence.add(1);
-        startSequence.add(0);
-        startSequence.add(0);
-        startSequence.add(1);
         startSequence.add(1);
         startSequence.add(0);
         startSequence.add(1);
+        startSequence.add(0);
+        startSequence.add(1);
+        startSequence.add(0);
         submit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Integer> temporaryList = new ArrayList();
@@ -120,7 +120,8 @@ public class JavaApplication5 extends JFrame {
             changeColor(list, RATE, drawingArea, LOWCOLOR, HIGHCOLOR);
             changeColor(startSequence, RATE, drawingArea, LOWCOLOR, HIGHCOLOR);
             list.removeAll(list);
-            
+            drawingArea.setBackground(Color.white);
+            System.out.print("\n");
         }
     }
     
@@ -129,11 +130,11 @@ public class JavaApplication5 extends JFrame {
         for(int i: message) {
             if(i == 1) {
                 panel.setBackground(high);
-                System.out.print("1");
+                // System.out.print("1");
                 
             } else {
                panel.setBackground(low);
-               System.out.print("0");
+               // System.out.print("0");
             }
             try {
                 Thread.sleep(rate);
@@ -141,7 +142,7 @@ public class JavaApplication5 extends JFrame {
                 Logger.getLogger(JavaApplication5.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        System.out.print("\n");
+        // System.out.print("\n");
     }
     
     public ArrayList<Integer> addFlags(Boolean setWeather, 
