@@ -3,12 +3,17 @@
 #include "pins.h"
 #include "display.h"
 #include "common.h"
+#include "control.h"
 
 int toggleLED = 0;
 IOBit toggleState = LOW;
-IOBit buzzerOn = LOW;
+IOBit buzzerOn = HIGH;
+int alarmCount = 0;
 
 void updateDisplay() {
+    if(isProgramming()) {
+        return;
+    }
     clearArray();
     setHourDisplay();
     setMinuteDisplay();
@@ -36,24 +41,29 @@ void setMinuteDisplay() {
 }
 
 void toggle() {
-    setArray(toggleLED, toggleState);
-    if(buzzerOn) {
+    if(!isProgramming()) {
+        setArray(toggleLED, toggleState);
+    }
+    if(buzzerOn == HIGH) {
         buzzer(toggleState);
-    } else {
-        buzzer(LOW);
+        DEBUG_PRINT("Alarm count %i\n", alarmCount);
+        alarmCount++;
+        if(alarmCount > 10) {
+            buzzerOn = LOW;
+            buzzer(LOW);
+        }
     }
     DEBUG_PRINT("Toggle LED: %i\n", toggleLED);
     if(toggleState) {
-        // PORTD = 0xFF;
         toggleState = LOW;
     } else {
-        // PORTD = 0x00;
         toggleState = HIGH;
     }
 }
 
 void setBuzzerOn(IOBit value) {
     buzzerOn = value;
+    alarmCount = 0;
 }
 
 void setPMDisplay() {

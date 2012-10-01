@@ -14,14 +14,16 @@
     #define UART_BAUD  9600
 
     typedef enum {
-        HIGH = 0,
-        LOW = 1
+        HIGH = 1,
+        LOW = 0
     } IOBit;
 
     typedef enum {
         INPUT = 0x00,
         OUTPUT = 0xFF,
     } IOMode;
+    
+    int latchAddressTranslate[16];
     
     void setupSerial();
     
@@ -33,7 +35,7 @@
     void setArray(int, IOMode);
     
     void alarmLED(bool on);
-    void buzzer(bool on);
+    void buzzer(IOBit on);
     void pmLED(bool on);
     
 #endif	/* INOUT_H */
