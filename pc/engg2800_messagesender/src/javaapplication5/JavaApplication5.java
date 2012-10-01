@@ -26,7 +26,7 @@ public class JavaApplication5 extends JFrame {
     //literals for testing here
     
 
-    private static final int RATE = 100;
+    private static final int RATE = 80;
     private static final int WORDLENGTH = 8;
     private static final int LONGLENGTH = WORDLENGTH * 2;
 
@@ -73,11 +73,11 @@ public class JavaApplication5 extends JFrame {
         JCheckBox weatherCheck = new JCheckBox("Set Weather");
         JCheckBox alarmCheck = new JCheckBox("Set Alarm");
         JCheckBox activeAlarmCheck = new JCheckBox("Alarm Active");
-        JCheckBox timeCheck = new JCheckBox("Set Time");
+        //JCheckBox timeCheck = new JCheckBox("Set Time");
         controlArea.add(weatherCheck);
         controlArea.add(alarmCheck);
         controlArea.add(activeAlarmCheck);
-        controlArea.add(timeCheck);
+        //controlArea.add(timeCheck);
         JButton submit = new JButton("Program Clock");
         controlArea.add(submit);
         content.add(controlArea, BorderLayout.EAST);
@@ -114,7 +114,7 @@ public class JavaApplication5 extends JFrame {
 
             int forecast = getForecast();
             list.addAll(addFlags(weatherCheck.isSelected(), alarmCheck.isSelected()
-                , timeCheck.isSelected(), forecast));
+                , activeAlarmCheck.isSelected(), forecast));
             changeColor(startSequence, RATE, drawingArea, HIGHCOLOR, LOWCOLOR);
             changeColor(list, RATE, drawingArea, HIGHCOLOR, LOWCOLOR);
             changeColor(list, RATE, drawingArea, LOWCOLOR, HIGHCOLOR);
@@ -145,7 +145,7 @@ public class JavaApplication5 extends JFrame {
     }
     
     public ArrayList<Integer> addFlags(Boolean setWeather, 
-            Boolean setAlarm, Boolean setTime, int forecast) {
+            Boolean setAlarm, Boolean setActive, int forecast) {
             ArrayList<Integer> list = new ArrayList();
             //Alarm changed
              if(setAlarm) {
@@ -154,23 +154,18 @@ public class JavaApplication5 extends JFrame {
                 list.add(0);
             }
             //Alarm Active
-            
+            if(setActive) {
+                list.add(1);
+            } else {
+                list.add(0);
+            }
             //Weather Changed
-            
-            //Weather bit 1 and 2
-            
-            //Three 0's
             if(setWeather) {
                 list.add(1);
             } else {
                 list.add(0);
             }
-           
-            if(setTime) {
-                list.add(1);
-            } else {
-                list.add(0);
-            }
+            //Weather bit 1 and 2
             switch (forecast) {
                 case CLEARWEATHER: list.add(0);
                         list.add(0);
@@ -182,6 +177,12 @@ public class JavaApplication5 extends JFrame {
                         list.add(0);
                         break;
             }
+            //Three 0's
+            list.add(0);
+            list.add(0);
+            list.add(0);
+           
+            
             System.out.println(list.toString());
             return list;
     }
