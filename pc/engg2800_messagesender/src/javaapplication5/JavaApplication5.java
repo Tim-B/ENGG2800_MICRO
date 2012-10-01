@@ -72,9 +72,11 @@ public class JavaApplication5 extends JFrame {
         controlArea.add(form);
         JCheckBox weatherCheck = new JCheckBox("Set Weather");
         JCheckBox alarmCheck = new JCheckBox("Set Alarm");
+        JCheckBox activeAlarmCheck = new JCheckBox("Alarm Active");
         JCheckBox timeCheck = new JCheckBox("Set Time");
         controlArea.add(weatherCheck);
         controlArea.add(alarmCheck);
+        controlArea.add(activeAlarmCheck);
         controlArea.add(timeCheck);
         JButton submit = new JButton("Program Clock");
         controlArea.add(submit);
@@ -99,8 +101,8 @@ public class JavaApplication5 extends JFrame {
         submit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Integer> temporaryList = new ArrayList();
-                temporaryList.addAll(form.getBinary(ALARMHOURTEXT, ALARMMINUTETEXT, WORDLENGTH));
-                temporaryList.addAll(form.getBinary(CLOCKHOURTEXT, CLOCKMINUTETEXT, WORDLENGTH));
+                temporaryList.addAll(form.getBinary(CLOCKHOURTEXT, CLOCKMINUTETEXT, LONGLENGTH));
+                temporaryList.addAll(form.getBinary(ALARMHOURTEXT, ALARMMINUTETEXT, LONGLENGTH));
                 list.addAll(temporaryList);
                 System.out.println(list.toString());
             }
@@ -145,16 +147,25 @@ public class JavaApplication5 extends JFrame {
     public ArrayList<Integer> addFlags(Boolean setWeather, 
             Boolean setAlarm, Boolean setTime, int forecast) {
             ArrayList<Integer> list = new ArrayList();
+            //Alarm changed
+             if(setAlarm) {
+                list.add(1);
+            } else {
+                list.add(0);
+            }
+            //Alarm Active
+            
+            //Weather Changed
+            
+            //Weather bit 1 and 2
+            
+            //Three 0's
             if(setWeather) {
                 list.add(1);
             } else {
                 list.add(0);
             }
-            if(setAlarm) {
-                list.add(1);
-            } else {
-                list.add(0);
-            }
+           
             if(setTime) {
                 list.add(1);
             } else {
