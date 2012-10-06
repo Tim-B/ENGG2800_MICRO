@@ -9,6 +9,7 @@ int toggleLED = 0;
 IOBit toggleState = LOW;
 IOBit buzzerOn = HIGH;
 int alarmCount = 0;
+bool cancelToggle = false;
 
 void updateDisplay() {
     if(isProgramming()) {
@@ -33,6 +34,11 @@ void setMinuteDisplay() {
         pin = 11;
     }
     setArray(pin, HIGH);
+    if(pin == toggleLED) {
+        cancelToggle = true;
+    } else {
+        cancelToggle = false;
+    }
     DEBUG_PRINT("Minute pin: %i\n", pin);
     int minPin = getMinute() % 5;
     if(minPin > 0) {
@@ -42,7 +48,17 @@ void setMinuteDisplay() {
 
 void toggle() {
     if(!isProgramming()) {
-        setArray(toggleLED, toggleState);
+        if(!cancelToggle) {
+            setArray(toggleLED, toggleState);
+        } else {
+            setArray(toggleLED, HIGH);
+        }
+    } else {
+        if(toggleState == HIGH) {
+            updateWeather(SUNNY);
+        } else {
+            updateWeather(NONE);
+        }
     }
     if(buzzerOn == HIGH) {
         buzzer(toggleState);
@@ -53,7 +69,7 @@ void toggle() {
             buzzer(LOW);
         }
     }
-    DEBUG_PRINT("Toggle LED: %i\n", toggleLED);
+    // DEBUG_PRINT("Toggle LED: %i\n", toggleLED);
     if(toggleState) {
         toggleState = LOW;
     } else {
@@ -79,8 +95,10 @@ void updateWeather(Weather value) {
         case CLOUDY:
             WEATHER_PORT |= WEATHER_CLOUDY;
             break;
-        default:
+        case RAINY:
             WEATHER_PORT |= WEATHER_RAINY;
+            break;
+        default:
             break;
     }
 }

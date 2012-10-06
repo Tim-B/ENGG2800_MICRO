@@ -8,10 +8,11 @@
 #include <util/delay.h>
 #define PC_RATE 160
 #define PC_SAMPLE 10
-#define TIME_PROGRESS_CODE 254
-#define ALARM_PROGRESS_CODE 253
-#define INCREMENT_CODE 252
-#define TOGGLE_ALARM 251
+#define TIME_PROGRESS_CODE 147
+#define ALARM_PROGRESS_CODE 163
+#define INCREMENT_CODE 131
+#define CANCEL_CODE 171
+#define TOGGLE_ALARM 155
 
 bool programmingActive = false;
 int tmpValue = 0;
@@ -22,13 +23,9 @@ void setupControl() {
     commandWaiting = 0;
     SENSOR_PORT &= ~SENSOR_DDR_MASK;
     EICR_def |= EICR_value;
-    // enablePCInt();
     EIMSK_def |= EIMSK_OPTIC_VALUE;
-    enableIRInt();
-    // DDRB |= 0x80;
+    EIMSK_def |= EIMSK_IR_VALUE;
     DEBUG_PRINT("interrupt setup\n");
-    alarmLED(false);
-    pmLED(false);
 }
 
 void printArray(int *value, int total) {
@@ -39,8 +36,12 @@ void printArray(int *value, int total) {
 }
 
 ISR(INT0_vect) {
-    disableIRInt();
     int code = readCommand();
+    if(code == 255) {
+        enableIRInt();
+        return;
+    }
+
     switch(code) {
         case TOGGLE_ALARM:
             processToggleAlarm();
@@ -54,8 +55,11 @@ ISR(INT0_vect) {
         case ALARM_PROGRESS_CODE:
             processProgressAlarm();
             break;
+        case CANCEL_CODE:
+            processCancel();
+            break;
     }
-    enableIRInt();
+    _delay_us(15000);
 }
 
 void processIncrement() {
@@ -71,10 +75,7 @@ void processIncrement() {
             incrementOuter();
             break;
         case TIME_HOUR:
-            incrementOuter();
-            break;
-        case TIME_PM:
-            incrementPM();
+            incrementHour();
             break;
         case ALARM_INNER_MINUTE:
             incrementInner();
@@ -83,9 +84,8 @@ void processIncrement() {
             incrementOuter();
             break;
         case ALARM_HOUR:
-            incrementOuter();
-        case ALARM_PM:
-            incrementPM();
+            incrementHour();
+            break;
     }
 }
 
@@ -93,33 +93,57 @@ void incrementInner() {
     if(tmpValue > 4) {
         tmpValue = 0;
     }
-    displayVal(tmpValue + 12);
+    if(tmpValue == 0) {
+        clearArray();
+    } else {
+        displayVal(tmpValue + 11);
+    }
 }
 
 void incrementOuter() {
-    if(tmpValue > 12) {
+    if(tmpValue > 11) {
         tmpValue = 0;
     }
     displayVal(tmpValue);
     
 }
 
+
+void incrementHour() {
+    if(tmpValue > 23) {
+        tmpValue = 0;
+    }
+    if(tmpValue < 12) {
+        displayVal(tmpValue);
+        pmLED(false);
+    } else {
+        displayVal(tmpValue - 12);
+        pmLED(true);
+    }
+}
 void displayVal(int value) {
+    DEBUG_PRINT("Display: %i\n", value);
     clearArray();
     setArray(value, HIGH);
 }
 
-void incrementPM() {
-    
-}
 
 void processToggleAlarm() {
-
+    if(alarmActive()) {
+        setAlarmActive(false);
+        alarmLED(false);
+        DEBUG_PRINT("alarm inactive\n");
+    } else {
+        setAlarmActive(true);
+        alarmLED(true);   
+        DEBUG_PRINT("alarm active\n");
+    }
 }
 
 void processProgressTime() {
     switch(stage) {
         case NO_COMMAND:
+            DEBUG_PRINT("Programming time\n");
             stage = TIME_INNER_MINUTE;
             newTime = 0;
             tmpValue = 0;
@@ -134,21 +158,20 @@ void processProgressTime() {
             setNewTime(60 * 5);
             break;
         case TIME_HOUR:
-            stage = TIME_PM;
-            setNewTime(60 * 60);
-            break;
-        case TIME_PM:
             stage = NO_COMMAND;
+            setNewTime(60 * 60);
             setTime(newTime);
-            updateDisplay();
+            refresh();
+            DEBUG_PRINT("New time: %lu\n", newTime);
             break;
         default:
             break;
     } 
 }
 
-void setNewTime(int mult) {
+void setNewTime(uint16_t mult) {
     newTime += tmpValue * mult;
+    DEBUG_PRINT("Time: %lu\n", newTime);
     tmpValue = 0;
     displayVal(0);
 }
@@ -170,12 +193,10 @@ void processProgressAlarm() {
             setNewTime(60 * 5);
             break;
         case ALARM_HOUR:
-            stage = ALARM_PM;
-            setNewTime(60 * 60);
-            break;
-        case ALARM_PM:
             stage = NO_COMMAND;
+            setNewTime(60 * 60);
             setAlarm(newTime);
+            refresh();
             updateDisplay();
             break;
         default:
@@ -183,13 +204,21 @@ void processProgressAlarm() {
     } 
 }
 
+void processCancel() {
+    if(stage == NO_COMMAND) {
+        return;
+    }
+    stage = NO_COMMAND;
+    refresh();
+    updateDisplay();
+    DEBUG_PRINT("Programming cancelled\n");
+}
+
 bool isProgramming() {
     return !(stage == NO_COMMAND);
 }
 
 ISR(INT1_vect) {
-    disablePCInt();
-
     if(!checkStart()) {
         programFailed();
         return;
@@ -274,7 +303,7 @@ ISR(INT1_vect) {
     DEBUG_PRINT("Check Time1: %u, Time2: %u\n", time1_check, time2_check);
     DEBUG_PRINT("Check Alarm1: %u, Alarm2: %u\n", alarm1_check, alarm2_check);
     DEBUG_PRINT("Check Settings: %u\n", settings_check);
-    
+
     programSuccess();
 }
 
@@ -288,7 +317,6 @@ bool checkStart() {
         output |= tmpBit;
         if((output & 0b00111111) == 0b00101011) {
             // DEBUG_PRINT("Start match: %i\n", output);
-            pmLED(true);
             return true;
         }
     }
@@ -309,13 +337,11 @@ uint8_t readPCWord() {
 }
 
 void programFailed() {
-    enablePCInt();
-    // DEBUG_PRINT("Programming failed\n");
+
 }
 
 void programSuccess() {
-    enablePCInt();
-    // DEBUG_PRINT("Programming success\n");
+
 }
 
 int readPCBit() {
@@ -340,15 +366,12 @@ int readPCBit() {
 }
 
 void disablePCInt() {
-    alarmLED(true);
     // PORTB |= 0x80;
     // EIMSK_def &= ~EIMSK_OPTIC_VALUE;
     // DEBUG_PRINT("PC Int disabled\n");
 }
 
 void enablePCInt() {
-    alarmLED(false);
-    pmLED(false);
     // PORTB &= ~0x80;
     // EIMSK_def |= EIMSK_OPTIC_VALUE;
     // DEBUG_PRINT("PC Int enabled\n");
@@ -364,24 +387,42 @@ void enableIRInt() {
     // DEBUG_PRINT("IR Int enabled\n");
 }
 
+void returnStartIR() {
+    int i, k;
+    int highCount = 0;
+    for(i = 0; i < 8; i++) {
+        _delay_us(200);
+        for(k = 0; k < 8; k++) {
+            if(SENSOR_PIN & SENSOR_IR_MASK) {
+                highCount++;
+            }
+            _delay_us(150);
+        }
+        _delay_us(200);
+        if(highCount > 4) {
+            return;
+        }
+    }
+}
+
 int readCommand() {
     int command = 0;
     int highCount = 0;
     int i, k;
     for(i = 0; i < 8; i++) {
         highCount = 0;
-        for(k = 0; k < 5; k++) {
-            if(PIND & 0x04) {
+        _delay_us(100);
+        for(k = 0; k < 8; k++) {
+            if(SENSOR_PIN & SENSOR_IR_MASK) {
                 highCount++;
             }
-            _delay_us(320);
+            _delay_us(175);
         }
-        if(highCount > 2) {
-            command |= 1 << i;
+        _delay_us(100);
+        command = command << 1;
+        if(highCount > 4) {
+            command |= 1;
         }
     }
-    
-    DEBUG_PRINT("%i\n", command);
-    _delay_ms(1000);
     return command;
 }

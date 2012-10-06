@@ -29,17 +29,18 @@
     void setNewTime();
     bool isProgramming();
     bool checkStart();
+    void returnStartIR();
+    void processCancel();
+    void incrementHour();
     
     typedef enum {
         NO_COMMAND = 0,
         TIME_INNER_MINUTE = 1,
         TIME_OUTER_MINUTE = 2,
         TIME_HOUR = 3,
-        TIME_PM = 4,
-        ALARM_INNER_MINUTE = 5,
-        ALARM_OUTER_MINUTE = 6,
-        ALARM_HOUR = 7,
-        ALARM_PM = 8
+        ALARM_INNER_MINUTE = 4,
+        ALARM_OUTER_MINUTE = 5,
+        ALARM_HOUR = 6,
     } Stage;
 
 #endif	/* TCONTROL_H */

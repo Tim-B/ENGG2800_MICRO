@@ -10,7 +10,7 @@
     #include <stdio.h>
     #define DEBUG
     #define TEST
- 
+    #define ARDUINO
     #ifdef DEBUG
         #define DEBUG_PRINT(a, ...) printf(a, ##__VA_ARGS__)
     #else
@@ -54,6 +54,7 @@
         #define EIMSK_OPTIC_VALUE 0x02
         #define SENSOR_PIN PIND
         #define SENSOR_OPTICAL_MASK 0x02
+        #define SENSOR_IR_MASK 0x01
         #define LATCH1_DDRMASK 0x37
         #define LATCH2_DDRMASK 0xE0
         #define ALARM_LED_PORT PORTC
@@ -68,7 +69,7 @@
         #define WEATHER_CLOUDY 0x02
         #define WEATHER_RAINY 0x04
         #define SENSOR_PORT PORTD
-        #define SENSOR_DDR_MASK 0x0C
+        #define SENSOR_DDR_MASK 0x03
     #else
         #define UBRRH_def UBRR0H
         #define UBRRL_def UBRR0L

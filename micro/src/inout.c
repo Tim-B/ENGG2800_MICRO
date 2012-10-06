@@ -99,7 +99,7 @@ void clearArray() {
     _delay_us(100);
     LATCH_PORT1 |= LATCH1_MEMORY;
     LATCH_PORT2 |= LATCH2_MEMORY;
-    DEBUG_PRINT("Cleared\n");
+    // DEBUG_PRINT("Cleared\n");
 }
 
 void setArray(int value, IOMode mode) {
