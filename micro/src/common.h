@@ -10,7 +10,6 @@
     #include <stdio.h>
     #define DEBUG
     #define TEST
-    #define ARDUINO
  
     #ifdef DEBUG
         #define DEBUG_PRINT(a, ...) printf(a, ##__VA_ARGS__)

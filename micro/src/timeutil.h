@@ -26,6 +26,7 @@ void setAlarmActive(uint8_t value);
 void setTime(uint32_t);
 void setWeather(Weather);
 void setAlarm(uint32_t);
+void refresh();
 
 #endif	/* TIMEUTIL_H */
 

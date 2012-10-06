@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <avr/interrupt.h>  
 #include <util/delay.h>
-#define PC_RATE 120
+#define PC_RATE 160
 #define PC_SAMPLE 10
 #define TIME_PROGRESS_CODE 254
 #define ALARM_PROGRESS_CODE 253
@@ -25,8 +25,10 @@ void setupControl() {
     // enablePCInt();
     EIMSK_def |= EIMSK_OPTIC_VALUE;
     enableIRInt();
-    DDRB |= 0x80;
+    // DDRB |= 0x80;
     DEBUG_PRINT("interrupt setup\n");
+    alarmLED(false);
+    pmLED(false);
 }
 
 void printArray(int *value, int total) {
@@ -236,6 +238,8 @@ ISR(INT1_vect) {
     uint32_t newAlarm = ((uint32_t) alarm1 << 8) | ((uint32_t) alarm2);
     
     setTime(newTime);
+    refresh();
+    updateDisplay();
     
     if(settings & 0x01) {
         setAlarm(newAlarm);
@@ -282,8 +286,9 @@ bool checkStart() {
         tmpBit = readPCBit();
         output = output << 1;
         output |= tmpBit;
-        if((output & 0b00111111) == 0b00101010) {
+        if((output & 0b00111111) == 0b00101011) {
             // DEBUG_PRINT("Start match: %i\n", output);
+            pmLED(true);
             return true;
         }
     }
@@ -318,7 +323,7 @@ int readPCBit() {
     int value = 0;
     int i;
     // _delay_ms(24);
-    _delay_ms(20);
+    _delay_ms(40);
     for(i = 0; i < 8; i++) {
         value = SENSOR_PIN & SENSOR_OPTICAL_MASK;
         if(value) {
@@ -326,34 +331,37 @@ int readPCBit() {
         }
         _delay_ms(PC_SAMPLE);
     }
-    _delay_ms(20);
+    _delay_ms(40);
     if(avgCount > 4) {
-        return 0; 
-    } else {
         return 1;
+    } else {        
+        return 0; 
     }
 }
 
 void disablePCInt() {
-    PORTB |= 0x80;
+    alarmLED(true);
+    // PORTB |= 0x80;
     // EIMSK_def &= ~EIMSK_OPTIC_VALUE;
     // DEBUG_PRINT("PC Int disabled\n");
 }
 
 void enablePCInt() {
-    PORTB &= ~0x80;
+    alarmLED(false);
+    pmLED(false);
+    // PORTB &= ~0x80;
     // EIMSK_def |= EIMSK_OPTIC_VALUE;
     // DEBUG_PRINT("PC Int enabled\n");
 }
 
 void disableIRInt() {
-    EIMSK_def &= ~EIMSK_IR_VALUE;
-    DEBUG_PRINT("IRInt disabled\n");
+    // EIMSK_def &= ~EIMSK_IR_VALUE;
+    // DEBUG_PRINT("IRInt disabled\n");
 }
 
 void enableIRInt() {
-    EIMSK_def |= EIMSK_IR_VALUE;
-    DEBUG_PRINT("IR Int enabled\n");
+    // EIMSK_def |= EIMSK_IR_VALUE;
+    // DEBUG_PRINT("IR Int enabled\n");
 }
 
 int readCommand() {
