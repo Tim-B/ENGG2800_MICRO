@@ -29,9 +29,9 @@
     void setNewTime();
     bool isProgramming();
     bool checkStart();
-    void returnStartIR();
     void processCancel();
     void incrementHour();
+    void cycle();
     
     typedef enum {
         NO_COMMAND = 0,

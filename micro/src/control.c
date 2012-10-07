@@ -18,6 +18,7 @@ bool programmingActive = false;
 int tmpValue = 0;
 Stage stage = NO_COMMAND;
 uint32_t newTime = 0;
+bool IRwaiting = false;
 
 void setupControl() {
     commandWaiting = 0;
@@ -30,19 +31,24 @@ void setupControl() {
 
 void printArray(int *value, int total) {
     int i;
-    for(i = 0; i < total; i++) {
+    for (i = 0; i < total; i++) {
         DEBUG_PRINT("Value: %i\n", value[i]);
     }
 }
 
 ISR(INT0_vect) {
+    disableIRInt();
+    IRwaiting= true;
+}
+
+void IRIncomming() {
     int code = readCommand();
-    if(code == 255) {
+    if (code == 255) {
         enableIRInt();
+        IRwaiting = false;
         return;
     }
-
-    switch(code) {
+    switch (code) {
         case TOGGLE_ALARM:
             processToggleAlarm();
             break;
@@ -59,12 +65,14 @@ ISR(INT0_vect) {
             processCancel();
             break;
     }
-    _delay_us(15000);
+    _delay_ms(1000);
+    enableIRInt();
+    IRwaiting = false;
 }
 
 void processIncrement() {
     tmpValue++;
-    switch(stage) {
+    switch (stage) {
         case NO_COMMAND:
             return;
             break;
@@ -90,10 +98,10 @@ void processIncrement() {
 }
 
 void incrementInner() {
-    if(tmpValue > 4) {
+    if (tmpValue > 4) {
         tmpValue = 0;
     }
-    if(tmpValue == 0) {
+    if (tmpValue == 0) {
         clearArray();
     } else {
         displayVal(tmpValue + 11);
@@ -101,19 +109,18 @@ void incrementInner() {
 }
 
 void incrementOuter() {
-    if(tmpValue > 11) {
+    if (tmpValue > 11) {
         tmpValue = 0;
     }
     displayVal(tmpValue);
-    
+
 }
 
-
 void incrementHour() {
-    if(tmpValue > 23) {
+    if (tmpValue > 23) {
         tmpValue = 0;
     }
-    if(tmpValue < 12) {
+    if (tmpValue < 12) {
         displayVal(tmpValue);
         pmLED(false);
     } else {
@@ -121,27 +128,27 @@ void incrementHour() {
         pmLED(true);
     }
 }
+
 void displayVal(int value) {
     DEBUG_PRINT("Display: %i\n", value);
     clearArray();
     setArray(value, HIGH);
 }
 
-
 void processToggleAlarm() {
-    if(alarmActive()) {
+    if (alarmActive()) {
         setAlarmActive(false);
         alarmLED(false);
         DEBUG_PRINT("alarm inactive\n");
     } else {
         setAlarmActive(true);
-        alarmLED(true);   
+        alarmLED(true);
         DEBUG_PRINT("alarm active\n");
     }
 }
 
 void processProgressTime() {
-    switch(stage) {
+    switch (stage) {
         case NO_COMMAND:
             DEBUG_PRINT("Programming time\n");
             stage = TIME_INNER_MINUTE;
@@ -166,7 +173,7 @@ void processProgressTime() {
             break;
         default:
             break;
-    } 
+    }
 }
 
 void setNewTime(uint16_t mult) {
@@ -177,7 +184,7 @@ void setNewTime(uint16_t mult) {
 }
 
 void processProgressAlarm() {
-    switch(stage) {
+    switch (stage) {
         case NO_COMMAND:
             stage = ALARM_INNER_MINUTE;
             newTime = 0;
@@ -201,11 +208,11 @@ void processProgressAlarm() {
             break;
         default:
             break;
-    } 
+    }
 }
 
 void processCancel() {
-    if(stage == NO_COMMAND) {
+    if (stage == NO_COMMAND) {
         return;
     }
     stage = NO_COMMAND;
@@ -219,69 +226,69 @@ bool isProgramming() {
 }
 
 ISR(INT1_vect) {
-    if(!checkStart()) {
+    if (!checkStart()) {
         programFailed();
         return;
     }
-    
+
     uint8_t time1 = readPCWord();
     uint8_t time2 = readPCWord();
     uint8_t alarm1 = readPCWord();
     uint8_t alarm2 = readPCWord();
     uint8_t settings = readPCWord();
-    
+
     uint8_t time1_check = readPCWord();
     uint8_t time2_check = readPCWord();
     uint8_t alarm1_check = readPCWord();
     uint8_t alarm2_check = readPCWord();
     uint8_t settings_check = readPCWord();
-    
+
     uint8_t end_check = ~readPCWord();
 
-    if(time1_check != ~time1) {
+    if (time1_check != ~time1) {
         // programFailed();
         // return;
     }
-    
-    if(time2_check != ~time2) {
+
+    if (time2_check != ~time2) {
         // programFailed();
         // return;
     }
-    
-    if(alarm1_check != ~alarm1) {
+
+    if (alarm1_check != ~alarm1) {
         // programFailed();
         // return;
     }
-    
-    if(alarm2_check != ~alarm2) {
+
+    if (alarm2_check != ~alarm2) {
         // programFailed();
         // return;
     }
-    
-    if(settings_check != ~settings) {
+
+    if (settings_check != ~settings) {
         // programFailed();
         // return;
     }
-    
+
     uint32_t newTime = ((uint32_t) time1 << 8) | ((uint32_t) time2);
     uint32_t newAlarm = ((uint32_t) alarm1 << 8) | ((uint32_t) alarm2);
-    
+
     setTime(newTime);
     refresh();
     updateDisplay();
-    
-    if(settings & 0x01) {
+
+    if (settings & 0x01) {
         setAlarm(newAlarm);
     }
-    
-    if(settings & 0x02) {
+
+    if (settings & 0x02) {
         setAlarmActive(1);
     } else {
         setAlarmActive(0);
     }
-    
+
     int weather = (settings & 0x18) >> 3;
-    switch(weather) {
+    switch (weather) {
         case 0x01:
             setWeather(SUNNY);
             break;
@@ -295,11 +302,11 @@ ISR(INT1_vect) {
             setWeather(NONE);
             break;
     }
-    
+
     DEBUG_PRINT("Time1: %u, Time2: %u, Full: %lu\n", time1, time2, newTime);
     DEBUG_PRINT("Alarm1: %u, Alarm2: %u, Full: %lu\n", alarm1, alarm2, newAlarm);
     DEBUG_PRINT("Settings: %u\n", settings);
-    
+
     DEBUG_PRINT("Check Time1: %u, Time2: %u\n", time1_check, time2_check);
     DEBUG_PRINT("Check Alarm1: %u, Alarm2: %u\n", alarm1_check, alarm2_check);
     DEBUG_PRINT("Check Settings: %u\n", settings_check);
@@ -311,24 +318,24 @@ bool checkStart() {
     int output = 0;
     int i;
     int tmpBit;
-    for(i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++) {
         tmpBit = readPCBit();
         output = output << 1;
         output |= tmpBit;
-        if((output & 0b00111111) == 0b00101011) {
+        if ((output & 0b00111111) == 0b00101011) {
             // DEBUG_PRINT("Start match: %i\n", output);
             return true;
         }
     }
     // DEBUG_PRINT("Start false match: %i\n", output);
-    return false;  
+    return false;
 }
 
 uint8_t readPCWord() {
     uint8_t output = 0;
     int i;
     uint8_t tmpBit;
-    for(i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++) {
         tmpBit = readPCBit();
         output = output << 1;
         output |= tmpBit;
@@ -350,79 +357,65 @@ int readPCBit() {
     int i;
     // _delay_ms(24);
     _delay_ms(40);
-    for(i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++) {
         value = SENSOR_PIN & SENSOR_OPTICAL_MASK;
-        if(value) {
+        if (value) {
             avgCount++;
         }
         _delay_ms(PC_SAMPLE);
     }
     _delay_ms(40);
-    if(avgCount > 4) {
+    if (avgCount > 4) {
         return 1;
-    } else {        
-        return 0; 
+    } else {
+        return 0;
     }
 }
 
 void disablePCInt() {
-    // PORTB |= 0x80;
-    // EIMSK_def &= ~EIMSK_OPTIC_VALUE;
+    EIMSK_def &= ~EIMSK_OPTIC_VALUE;
     // DEBUG_PRINT("PC Int disabled\n");
 }
 
 void enablePCInt() {
-    // PORTB &= ~0x80;
-    // EIMSK_def |= EIMSK_OPTIC_VALUE;
+    EIMSK_def |= EIMSK_OPTIC_VALUE;
     // DEBUG_PRINT("PC Int enabled\n");
 }
 
 void disableIRInt() {
-    // EIMSK_def &= ~EIMSK_IR_VALUE;
+    EIMSK_def &= ~EIMSK_IR_VALUE;
     // DEBUG_PRINT("IRInt disabled\n");
 }
 
 void enableIRInt() {
-    // EIMSK_def |= EIMSK_IR_VALUE;
+    EIMSK_def |= EIMSK_IR_VALUE;
     // DEBUG_PRINT("IR Int enabled\n");
-}
-
-void returnStartIR() {
-    int i, k;
-    int highCount = 0;
-    for(i = 0; i < 8; i++) {
-        _delay_us(200);
-        for(k = 0; k < 8; k++) {
-            if(SENSOR_PIN & SENSOR_IR_MASK) {
-                highCount++;
-            }
-            _delay_us(150);
-        }
-        _delay_us(200);
-        if(highCount > 4) {
-            return;
-        }
-    }
 }
 
 int readCommand() {
     int command = 0;
     int highCount = 0;
     int i, k;
-    for(i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++) {
         highCount = 0;
         _delay_us(100);
-        for(k = 0; k < 8; k++) {
-            if(SENSOR_PIN & SENSOR_IR_MASK) {
+        for (k = 0; k < 8; k++) {
+            if (SENSOR_PIN & SENSOR_IR_MASK) {
                 highCount++;
             }
             _delay_us(175);
         }
         _delay_us(100);
         command = command << 1;
-        if(highCount > 4) {
+        if (highCount > 4) {
             command |= 1;
         }
     }
     return command;
+}
+
+void cycle() {
+    if (IRwaiting) {
+        IRIncomming();
+    }
 }

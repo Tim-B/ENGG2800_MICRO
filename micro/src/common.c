@@ -27,4 +27,6 @@ void setup() {
     DEBUG_PRINT("START\n");
 }
 
-void loop() {}
+void loop() {
+    cycle();
+}
