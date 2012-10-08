@@ -23,8 +23,9 @@ void setup() {
     setupArray();
     // setupClock();
     setupControl();
-    sei();
     DEBUG_PRINT("START\n");
+    sei();
+    
 }
 
 void loop() {

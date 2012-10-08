@@ -44,8 +44,10 @@ ISR(INT0_vect) {
 void IRIncomming() {
     int code = readCommand();
     if (code == 255) {
-        enableIRInt();
         IRwaiting = false;
+        enableIRInt();
+        
+        // DEBUG_PRINT("wrong code mate\n");
         return;
     }
     switch (code) {
@@ -66,8 +68,8 @@ void IRIncomming() {
             break;
     }
     _delay_ms(1000);
-    enableIRInt();
     IRwaiting = false;
+    enableIRInt();
 }
 
 void processIncrement() {
@@ -228,6 +230,7 @@ bool isProgramming() {
 ISR(INT1_vect) {
     if (!checkStart()) {
         programFailed();
+        DEBUG_PRINT("prigram not thing\n");
         return;
     }
 
