@@ -13,7 +13,7 @@
     uint8_t readPCWord();
     void programFailed();
     void programSuccess();
-    int readPCBit();
+    uint8_t readPCBit();
     void disablePCInt();
     void enablePCInt();
     void disableIRInt();

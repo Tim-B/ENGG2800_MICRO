@@ -230,7 +230,7 @@ bool isProgramming() {
 ISR(INT1_vect) {
     if (!checkStart()) {
         programFailed();
-        DEBUG_PRINT("prigram not thing\n");
+        // DEBUG_PRINT("prigram not thing\n");
         return;
     }
 
@@ -246,31 +246,43 @@ ISR(INT1_vect) {
     uint8_t alarm2_check = readPCWord();
     uint8_t settings_check = readPCWord();
 
-    uint8_t end_check = ~readPCWord();
+    uint8_t end_check = readPCWord();
 
-    if (time1_check != ~time1) {
-        // programFailed();
-        // return;
+    if ((~time1_check & 0x00FF) != time1) {
+        DEBUG_PRINT("Time check 1 failed: %u %u\n", ~time1_check, time1);
+        programFailed();
+        return;
     }
 
-    if (time2_check != ~time2) {
-        // programFailed();
-        // return;
+    if ((~time2_check & 0x00FF) != time2) {
+        DEBUG_PRINT("Time check 2 failed\n");
+        programFailed();
+        return;
     }
 
-    if (alarm1_check != ~alarm1) {
-        // programFailed();
-        // return;
+    if ((~alarm1_check & 0x00FF) != alarm1) {
+        DEBUG_PRINT("Alarm check 1 failed\n");
+        programFailed();
+        return;
     }
 
-    if (alarm2_check != ~alarm2) {
-        // programFailed();
-        // return;
+    if ((~alarm2_check & 0x00FF) != alarm2) {
+        DEBUG_PRINT("Alarm check 2 failed\n");
+        programFailed();
+        return;
     }
 
-    if (settings_check != ~settings) {
-        // programFailed();
-        // return;
+    if ((~settings_check & 0x00FF) != settings) {
+        DEBUG_PRINT("Settings failed failed\n");
+        programFailed();
+        return;
+    }
+    
+    
+    if ((~end_check & 0x00FF) != 0b01101011) {
+        DEBUG_PRINT("End check failed\n");
+        programFailed();
+        return;
     }
 
     uint32_t newTime = ((uint32_t) time1 << 8) | ((uint32_t) time2);
@@ -313,6 +325,7 @@ ISR(INT1_vect) {
     DEBUG_PRINT("Check Time1: %u, Time2: %u\n", time1_check, time2_check);
     DEBUG_PRINT("Check Alarm1: %u, Alarm2: %u\n", alarm1_check, alarm2_check);
     DEBUG_PRINT("Check Settings: %u\n", settings_check);
+    DEBUG_PRINT("Check end: %u\n", end_check);
 
     programSuccess();
 }
@@ -330,7 +343,7 @@ bool checkStart() {
             return true;
         }
     }
-    // DEBUG_PRINT("Start false match: %i\n", output);
+    DEBUG_PRINT("Start false match: %i\n", output);
     return false;
 }
 
@@ -347,19 +360,19 @@ uint8_t readPCWord() {
 }
 
 void programFailed() {
-
+    // DEBUG_PRINT("PC Programming failed\n");
 }
 
 void programSuccess() {
 
 }
 
-int readPCBit() {
+uint8_t readPCBit() {
     int avgCount = 0;
     int value = 0;
     int i;
     // _delay_ms(24);
-    _delay_ms(40);
+    _delay_ms(41);
     for (i = 0; i < 8; i++) {
         value = SENSOR_PIN & SENSOR_OPTICAL_MASK;
         if (value) {
@@ -369,9 +382,9 @@ int readPCBit() {
     }
     _delay_ms(40);
     if (avgCount > 4) {
-        return 1;
-    } else {
         return 0;
+    } else {
+        return 1;
     }
 }
 

@@ -70,6 +70,7 @@
         #define WEATHER_RAINY 0x04
         #define SENSOR_PORT PORTD
         #define SENSOR_DDR_MASK 0x03
+        #define CLOCK_COUNT 0x0BDC
     #else
         #define UBRRH_def UBRR0H
         #define UBRRL_def UBRR0L
@@ -117,6 +118,7 @@
         #define WEATHER_RAINY 0x04
         #define SENSOR_PORT PORTD
         #define SENSOR_DDR_MASK 0x0C
+        #define CLOCK_COUNT 0x85ED
     #endif
 
     volatile int commandWaiting;
