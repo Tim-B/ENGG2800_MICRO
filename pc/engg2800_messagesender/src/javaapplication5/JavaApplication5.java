@@ -124,6 +124,7 @@ public class JavaApplication5 extends JFrame {
             System.out.println(endTime);
             list.removeAll(list);
             drawingArea.setBackground(Color.white);
+            JOptionPane.showMessageDialog(null, "Programmed!");
             System.out.print("\n");
         }
     }

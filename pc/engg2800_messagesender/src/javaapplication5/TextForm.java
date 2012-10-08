@@ -55,10 +55,10 @@ class TextForm extends JPanel {
           } else {
               hourInt = Integer.parseInt(fields[hour].getText());
           }
-          if(fields[hour].getText().equals("")) {
+          if(fields[minute].getText().equals("")) {
               minuteInt = 0;
           } else {
-              minuteInt = Integer.parseInt(fields[hour].getText());
+              minuteInt = Integer.parseInt(fields[minute].getText());
           }
           int timeStamp = hourInt * 60 * 60 + minuteInt * 60;
           System.out.println("The timestamp is " + timeStamp);
