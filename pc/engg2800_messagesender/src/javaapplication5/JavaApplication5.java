@@ -26,7 +26,7 @@ public class JavaApplication5 extends JFrame {
     //literals for testing here
     
 
-    private static final int RATE = 120;
+    private static final int RATE = 160;
     private static final int WORDLENGTH = 8;
     private static final int LONGLENGTH = WORDLENGTH * 2;
 
@@ -97,7 +97,7 @@ public class JavaApplication5 extends JFrame {
         startSequence.add(1);
         startSequence.add(0);
         startSequence.add(1);
-        startSequence.add(0);
+        startSequence.add(1);
         submit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Integer> temporaryList = new ArrayList();
@@ -115,10 +115,13 @@ public class JavaApplication5 extends JFrame {
             int forecast = getForecast();
             list.addAll(addFlags(weatherCheck.isSelected(), alarmCheck.isSelected()
                 , activeAlarmCheck.isSelected(), forecast));
+            long profileTime = System.currentTimeMillis();
             changeColor(startSequence, RATE, drawingArea, HIGHCOLOR, LOWCOLOR);
             changeColor(list, RATE, drawingArea, HIGHCOLOR, LOWCOLOR);
             changeColor(list, RATE, drawingArea, LOWCOLOR, HIGHCOLOR);
             changeColor(startSequence, RATE, drawingArea, LOWCOLOR, HIGHCOLOR);
+            long endTime = System.currentTimeMillis() - profileTime;
+            System.out.println(endTime);
             list.removeAll(list);
             drawingArea.setBackground(Color.white);
             System.out.print("\n");
