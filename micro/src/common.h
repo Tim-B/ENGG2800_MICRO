@@ -118,7 +118,7 @@
         #define WEATHER_RAINY 0x04
         #define SENSOR_PORT PORTD
         #define SENSOR_DDR_MASK 0x0C
-        #define CLOCK_COUNT 0x85ED
+        #define CLOCK_COUNT 34285
         #define SENSOR_IR_MASK 0x04
     #endif
 

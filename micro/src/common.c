@@ -21,8 +21,8 @@ void setup() {
     setupSerial();
     setupPins(); 
     setupArray();
-    // setupClock();
-    setupControl();
+    setupClock();
+    // setupControl();
     DEBUG_PRINT("START\n");
     sei();
     
