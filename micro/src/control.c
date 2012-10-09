@@ -380,7 +380,7 @@ uint8_t readPCBit() {
     int value = 0;
     int i;
     // _delay_ms(24);
-    _delay_ms(41);
+    _delay_ms(42);
     for (i = 0; i < 8; i++) {
         value = SENSOR_PIN & SENSOR_OPTICAL_MASK;
         if (value) {
@@ -388,7 +388,7 @@ uint8_t readPCBit() {
         }
         _delay_ms(PC_SAMPLE);
     }
-    _delay_ms(40);
+    _delay_ms(43);
     if (avgCount > 4) {
         return 0;
     } else {

@@ -10,7 +10,7 @@
     #include <stdio.h>
     #define DEBUG
     #define TEST
-    #define ARDUINO
+
     #ifdef DEBUG
         #define DEBUG_PRINT(a, ...) printf(a, ##__VA_ARGS__)
     #else
@@ -119,6 +119,7 @@
         #define SENSOR_PORT PORTD
         #define SENSOR_DDR_MASK 0x0C
         #define CLOCK_COUNT 0x85ED
+        #define SENSOR_IR_MASK 0x04
     #endif
 
     volatile int commandWaiting;
