@@ -41,7 +41,10 @@ public class JavaApplication5 extends JFrame {
     private static final int TOMMOROWFORECAST = 2;
     
     private static final 
-            String WEATHERURL = "http://api.wunderground.com/api/ee6756280a23f6e9/forecast/q/YBBN.xml";
+            String IPURL = "http://api.wunderground.com/api/ee6756280a23f6e9/geolookup/q/autoip.xml";
+    
+    //private static final 
+            //String WEATHERURL = "http://api.wunderground.com/api/ee6756280a23f6e9/forecast/q/YBBN.xml";
     
     private static final Color HIGHCOLOR = Color.WHITE;
     private static final Color LOWCOLOR = Color.BLACK;
@@ -192,10 +195,35 @@ public class JavaApplication5 extends JFrame {
             return list;
     }
     
+    public String getWeatherStation(){
+        
+        String station;
+        try {
+            URL stationUrl = new URL(IPURL);
+            InputStream openStream = stationUrl.openStream();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(openStream);
+            NodeList formattedStation = doc.getElementsByTagName("icao");
+
+            Element formattedStationElement = 
+                    (Element) formattedStation.item(0);
+            station = formattedStationElement.getTextContent();
+        } catch (Exception e) {
+            station = "";
+        }
+        System.out.println(station);
+        return station;
+        
+    }
+    
     public int getForecast() {
         String forecast;
+        String station = getWeatherStation();
+        String weatherUrl = "http://api.wunderground.com/api/ee6756280a23f6e9/forecast/q/"
+                + station + ".xml";
         try {
-            URL forecastUrl = new URL(WEATHERURL);
+            URL forecastUrl = new URL(weatherUrl);
             InputStream openStream = forecastUrl.openStream();
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
