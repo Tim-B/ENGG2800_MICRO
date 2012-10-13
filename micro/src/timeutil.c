@@ -12,7 +12,7 @@ uint32_t alarmTime = 0;
 uint8_t seconds = 0;
 uint8_t minutes = 0;
 uint8_t hours = 0;
-bool alarmOn = false;
+bool alarmOn = true;
 Weather weatherValue = SUNNY;
 
 volatile uint8_t tot_overflow;
@@ -21,13 +21,15 @@ void refresh();
 void setupClock() {
 
     TIMSK_def = 0x01;
-    TCNT1 = CLOCK_COUNT;
+    
+    TCCR1A = 0x00;
     // TCCR1B = (unsigned char) 0x04;
-    TCCR1B = (unsigned char) 0x04;
-
+    TCNT1 = CLOCK_COUNT;
+    TCCR1B = 0x04;
+    
     // setTime(11520);
     setTime(0);
-    alarmTime = 11580;
+    alarmTime = 120;
     refresh();
     updateDisplay();
 /*
@@ -42,6 +44,8 @@ ISR(TIMER1_OVF_vect) {
     TCNT1 = CLOCK_COUNT;
     time = time + 1;
     DEBUG_PRINT("Time: %lu\n", time);
+/*
+    
     if(time >= 86400) {
         time = 0;
         refresh();
@@ -49,6 +53,7 @@ ISR(TIMER1_OVF_vect) {
         refresh();
     }
     toggle();
+*/
 }
 
 void checkAlarm() {

@@ -8,6 +8,7 @@
     void toggle();
     void setBuzzerOn(IOBit value);
     void updateWeather(Weather value);
+    void setAlarmDisplay();
     
 #endif	/* INOUT_H */
 

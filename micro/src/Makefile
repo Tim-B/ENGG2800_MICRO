@@ -8,7 +8,7 @@ MMCU=atmega1280
 PORT=COM3
 PROGRAM=arduino
 DEVICE=m1280
-FUSES=
+FUSES= -U lfuse:w:0xe2:m -U hfuse:w:0xdf:m -U efuse:w:0x01:m
 
 CFLAGS=-mmcu=$(MMCU) -Os -Wall
 	

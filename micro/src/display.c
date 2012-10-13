@@ -19,6 +19,7 @@ void updateDisplay() {
     setHourDisplay();
     setMinuteDisplay();
     setPMDisplay();
+    setAlarmDisplay();
     DEBUG_PRINT("Display time: %i:%i\n", getHour(), getMinute());
 }
 
@@ -29,7 +30,7 @@ void setHourDisplay() {
 }
 
 void setMinuteDisplay() {
-    int pin = (getMinute() / 5) - 1;
+    int pin = getMinute() / 5;
     if(pin < 0) {
         pin = 11;
     }
@@ -43,6 +44,7 @@ void setMinuteDisplay() {
     int minPin = getMinute() % 5;
     if(minPin > 0) {
         setArray((minPin - 1) + 12, HIGH);
+        DEBUG_PRINT("5 Minute pin: %i\n", (minPin - 1) + 12);
     }
 }
 
@@ -55,7 +57,7 @@ void toggle() {
         }
     } else {
         if(toggleState == HIGH) {
-            updateWeather(SUNNY);
+            updateWeather(CLOUDY);
         } else {
             updateWeather(NONE);
         }
@@ -84,6 +86,14 @@ void setBuzzerOn(IOBit value) {
 
 void setPMDisplay() {
     pmLED(isPM());
+}
+
+void setAlarmDisplay() {
+    if (alarmActive()) {
+        alarmLED(HIGH);
+    } else {
+        alarmLED(LOW);
+    }
 }
 
 void updateWeather(Weather value) {

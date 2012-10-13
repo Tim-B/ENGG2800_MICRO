@@ -22,7 +22,7 @@ void setup() {
     setupPins(); 
     setupArray();
     setupClock();
-    // setupControl();
+    setupControl();
     DEBUG_PRINT("START\n");
     sei();
     
@@ -30,4 +30,19 @@ void setup() {
 
 void loop() {
     cycle();
+/*
+    clearArray();
+    setArray(count, HIGH);
+    _delay_ms(2000);
+    if(count == 0) {
+        clearArray();
+        _delay_ms(1000);
+        setArray(count, HIGH);
+        _delay_ms(1000);
+    }
+    count++;
+    if(count > 15) {
+        count = 0;
+    }
+*/
 }

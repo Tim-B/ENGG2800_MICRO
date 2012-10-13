@@ -173,7 +173,7 @@ void processProgressTime() {
                 tmpNewTime = 0;
             }
             setNewTime(60 * 5 * tmpNewTime);
-            tmpValue = 1;
+            tmpValue = 0;
             displayVal(tmpValue);
             break;
         case TIME_HOUR:
@@ -194,27 +194,36 @@ void setNewTime(uint16_t mult) {
 }
 
 void processProgressAlarm() {
+    int tmpNewTime = 0;
     switch (stage) {
-        case NO_COMMAND:
-            stage = ALARM_INNER_MINUTE;
-            newTime = 0;
+       case NO_COMMAND:
+            DEBUG_PRINT("Programming time\n");
+            stage = TIME_INNER_MINUTE;
             tmpValue = 0;
+            newTime = 0;
             displayVal(0);
             break;
         case ALARM_INNER_MINUTE:
-            stage = ALARM_OUTER_MINUTE;
-            setNewTime(60);
+            stage = TIME_OUTER_MINUTE;
+            setNewTime(60 * tmpValue);
+            tmpValue = 0;
             break;
         case ALARM_OUTER_MINUTE:
-            stage = ALARM_HOUR;
-            setNewTime(60 * 5);
+            stage = TIME_HOUR;
+            tmpNewTime = tmpValue + 1;
+            if(tmpNewTime > 11) {
+                tmpNewTime = 0;
+            }
+            setNewTime(60 * 5 * tmpNewTime);
+            tmpValue = 0;
+            displayVal(tmpValue);
             break;
         case ALARM_HOUR:
             stage = NO_COMMAND;
-            setNewTime(60 * 60);
+            setNewTime(60 * 60 * tmpValue);
             setAlarm(newTime);
             refresh();
-            updateDisplay();
+            DEBUG_PRINT("New time: %lu\n", newTime);
             break;
         default:
             break;
