@@ -19,6 +19,7 @@ int tmpValue = 0;
 Stage stage = NO_COMMAND;
 uint32_t newTime = 0;
 bool IRwaiting = false;
+bool pcWaiting = false;
 
 void setupControl() {
     commandWaiting = 0;
@@ -38,7 +39,7 @@ void printArray(int *value, int total) {
 
 ISR(INT0_vect) {
     disableIRInt();
-    IRwaiting= true;
+    pcWaiting = true;
 }
 
 void IRIncomming() {
@@ -245,7 +246,13 @@ bool isProgramming() {
 }
 
 ISR(INT1_vect) {
+    disablePCInt();
+    pcWaiting = true;
+}
+
+void pcIncomming() {
     updateWeather(SUNNY);
+    
     if (!checkStart()) {
         updateWeather(RAINY);
         programFailed();
@@ -381,10 +388,14 @@ uint8_t readPCWord() {
 
 void programFailed() {
     // DEBUG_PRINT("PC Programming failed\n");
+    enablePCInt();
+    pcWaiting = false;
+    
 }
 
 void programSuccess() {
-
+    enablePCInt();
+    pcWaiting = false;
 }
 
 uint8_t readPCBit() {
@@ -453,5 +464,8 @@ int readCommand() {
 void cycle() {
     if (IRwaiting) {
         IRIncomming();
+    }
+    if (pcWaiting) {
+        pcIncomming();
     }
 }

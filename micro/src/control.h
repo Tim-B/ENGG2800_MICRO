@@ -32,6 +32,7 @@
     void processCancel();
     void incrementHour();
     void cycle();
+    void pcIncomming();
     
     typedef enum {
         NO_COMMAND = 0,
