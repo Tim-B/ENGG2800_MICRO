@@ -14,37 +14,34 @@ uint8_t minutes = 0;
 uint8_t hours = 0;
 bool alarmOn = true;
 Weather weatherValue = SUNNY;
+bool toggleBit = false;
 
 volatile uint8_t tot_overflow;
 void refresh();
 
 void setupClock() {
 
-    TIMSK_def = 0x01;
-    
-    TCCR1A = 0x00;
-    // TCCR1B = (unsigned char) 0x04;
-    TCNT1 = CLOCK_COUNT;
-    TCCR1B = 0x04;
+    TCCR1B |= (1 << WGM12)|(1 << CS12);
+
+    // initialize counter
+    TCNT1 = 0;
+
+    // initialize compare value
+    OCR1A = 32080;
+
+    // enable compare interrupt
+    TIMSK1 |= (1 << OCIE1A);
     
     // setTime(11520);
     setTime(0);
     alarmTime = 120;
     refresh();
-    updateDisplay();
-/*
-    TIMSK1 |= (1 << TOIE1);
-    TCCR1B |= (1 << CS11);
-    sei();
-*/
 }
 
 
-ISR(TIMER1_OVF_vect) {
-    TCNT1 = CLOCK_COUNT;
-    time = time + 1;
+ISR(TIMER1_COMPA_vect) {
+    time++;
     DEBUG_PRINT("Time: %lu\n", time);
-/*
     
     if(time >= 86400) {
         time = 0;
@@ -53,7 +50,6 @@ ISR(TIMER1_OVF_vect) {
         refresh();
     }
     toggle();
-*/
 }
 
 void checkAlarm() {

@@ -24,12 +24,20 @@ void setup() {
     setupClock();
     setupControl();
     DEBUG_PRINT("START\n");
+    // DDRD &= ~0x08;
     sei();
-    
 }
 
 void loop() {
     cycle();
+/*
+    if(PIND & 0x08) {
+        DEBUG_PRINT("High\n");
+    } else {
+        DEBUG_PRINT("LOW\n");
+    }
+*/
+    // _delay_ms(1000);
 /*
     clearArray();
     setArray(count, HIGH);

@@ -245,7 +245,9 @@ bool isProgramming() {
 }
 
 ISR(INT1_vect) {
+    updateWeather(SUNNY);
     if (!checkStart()) {
+        updateWeather(RAINY);
         programFailed();
         // DEBUG_PRINT("prigram not thing\n");
         return;
@@ -343,8 +345,9 @@ ISR(INT1_vect) {
     DEBUG_PRINT("Check Alarm1: %u, Alarm2: %u\n", alarm1_check, alarm2_check);
     DEBUG_PRINT("Check Settings: %u\n", settings_check);
     DEBUG_PRINT("Check end: %u\n", end_check);
-
+    
     programSuccess();
+    updateWeather(NONE);
 }
 
 bool checkStart() {
@@ -397,11 +400,11 @@ uint8_t readPCBit() {
         }
         _delay_ms(PC_SAMPLE);
     }
-    _delay_ms(43);
+    _delay_ms(44);
     if (avgCount > 4) {
-        return 0;
-    } else {
         return 1;
+    } else {
+        return 0;
     }
 }
 
