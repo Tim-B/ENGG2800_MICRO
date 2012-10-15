@@ -10,7 +10,7 @@
     #include <stdio.h>
     
     #define TEST
-
+    #define DEBUG
     #ifdef DEBUG
         #define DEBUG_PRINT(a, ...) printf(a, ##__VA_ARGS__)
     #else

@@ -41,7 +41,7 @@ void setupClock() {
 
 ISR(TIMER1_COMPA_vect) {
     time++;
-    DEBUG_PRINT("Time: %lu\n", time);
+    // DEBUG_PRINT("Time: %lu\n", time);
     
     if(time >= 86400) {
         time = 0;

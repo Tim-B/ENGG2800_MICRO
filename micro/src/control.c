@@ -39,7 +39,7 @@ void printArray(int *value, int total) {
 
 ISR(INT0_vect) {
     disableIRInt();
-    pcWaiting = true;
+    IRwaiting = true;
 }
 
 void IRIncomming() {
@@ -353,8 +353,9 @@ void pcIncomming() {
     DEBUG_PRINT("Check Settings: %u\n", settings_check);
     DEBUG_PRINT("Check end: %u\n", end_check);
     
-    programSuccess();
+    
     updateWeather(NONE);
+    programSuccess();
 }
 
 bool checkStart() {
@@ -388,14 +389,13 @@ uint8_t readPCWord() {
 
 void programFailed() {
     // DEBUG_PRINT("PC Programming failed\n");
-    enablePCInt();
     pcWaiting = false;
-    
+    enablePCInt();
 }
 
 void programSuccess() {
-    enablePCInt();
     pcWaiting = false;
+    enablePCInt();
 }
 
 uint8_t readPCBit() {
@@ -421,12 +421,12 @@ uint8_t readPCBit() {
 
 void disablePCInt() {
     EIMSK_def &= ~EIMSK_OPTIC_VALUE;
-    // DEBUG_PRINT("PC Int disabled\n");
+    DEBUG_PRINT("PC Int disabled\n");
 }
 
 void enablePCInt() {
     EIMSK_def |= EIMSK_OPTIC_VALUE;
-    // DEBUG_PRINT("PC Int enabled\n");
+    DEBUG_PRINT("PC Int enabled\n");
 }
 
 void disableIRInt() {
