@@ -12,8 +12,8 @@ uint32_t alarmTime = 0;
 uint8_t seconds = 0;
 uint8_t minutes = 0;
 uint8_t hours = 0;
-bool alarmOn = true;
-Weather weatherValue = SUNNY;
+bool alarmOn = false;
+Weather weatherValue = NONE;
 bool toggleBit = false;
 
 volatile uint8_t tot_overflow;
@@ -112,4 +112,8 @@ void setAlarmActive(bool value) {
 
 void setWeather(Weather value) {
     weatherValue = value;
+}
+
+Weather getWeather() {
+    return weatherValue;
 }

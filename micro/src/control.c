@@ -169,7 +169,7 @@ void processProgressTime() {
             break;
         case TIME_OUTER_MINUTE:
             stage = TIME_HOUR;
-            tmpNewTime = tmpValue + 1;
+            tmpNewTime = tmpValue;
             if(tmpNewTime > 11) {
                 tmpNewTime = 0;
             }
@@ -211,7 +211,7 @@ void processProgressAlarm() {
             break;
         case ALARM_OUTER_MINUTE:
             stage = TIME_HOUR;
-            tmpNewTime = tmpValue + 1;
+            tmpNewTime = tmpValue;
             if(tmpNewTime > 11) {
                 tmpNewTime = 0;
             }
@@ -251,10 +251,10 @@ ISR(INT1_vect) {
 }
 
 void pcIncomming() {
-    updateWeather(SUNNY);
+    // updateWeather(SUNNY);
     
     if (!checkStart()) {
-        updateWeather(RAINY);
+        // updateWeather(RAINY);
         programFailed();
         // DEBUG_PRINT("prigram not thing\n");
         return;
@@ -315,34 +315,43 @@ void pcIncomming() {
     uint32_t newAlarm = ((uint32_t) alarm1 << 8) | ((uint32_t) alarm2);
 
     setTime(newTime);
-    refresh();
-    updateDisplay();
-
-    if (settings & 0x01) {
+    
+    if (settings & 0x80) {
         setAlarm(newAlarm);
+        DEBUG_PRINT("Alarm set\n");
     }
 
-    if (settings & 0x02) {
+    if (settings & 0x40) {
         setAlarmActive(1);
+        DEBUG_PRINT("Alarm active\n");
     } else {
         setAlarmActive(0);
     }
 
-    int weather = (settings & 0x18) >> 3;
-    switch (weather) {
-        case 0x01:
-            setWeather(SUNNY);
-            break;
-        case 0x02:
-            setWeather(CLOUDY);
-            break;
-        case 0x03:
-            setWeather(RAINY);
-            break;
-        default:
-            setWeather(NONE);
-            break;
+    if(settings & 0x20) {
+        int weather = (settings & 0x18) >> 3;
+        DEBUG_PRINT("Weather: %i\n", weather);
+        switch (weather) {
+            case 0x00:
+                setWeather(SUNNY);
+                DEBUG_PRINT("Sunneh\n");
+                break;
+            case 0x01:
+                setWeather(CLOUDY);
+                DEBUG_PRINT("Cloudeh\n");
+                break;
+            case 0x02:
+                DEBUG_PRINT("Raineh\n");
+                setWeather(RAINY);
+                break;
+            default:
+                setWeather(NONE);
+                break;
+        }
     }
+    
+    
+    refresh();
 
     DEBUG_PRINT("Time1: %u, Time2: %u, Full: %lu\n", time1, time2, newTime);
     DEBUG_PRINT("Alarm1: %u, Alarm2: %u, Full: %lu\n", alarm1, alarm2, newAlarm);
@@ -354,7 +363,7 @@ void pcIncomming() {
     DEBUG_PRINT("Check end: %u\n", end_check);
     
     
-    updateWeather(NONE);
+    // updateWeather(NONE);
     programSuccess();
 }
 
@@ -403,7 +412,7 @@ uint8_t readPCBit() {
     int value = 0;
     int i;
     // _delay_ms(24);
-    _delay_ms(42);
+    _delay_ms(43);
     for (i = 0; i < 8; i++) {
         value = SENSOR_PIN & SENSOR_OPTICAL_MASK;
         if (value) {
@@ -411,7 +420,7 @@ uint8_t readPCBit() {
         }
         _delay_ms(PC_SAMPLE);
     }
-    _delay_ms(44);
+    _delay_ms(43);
     if (avgCount > 4) {
         return 1;
     } else {
@@ -421,12 +430,12 @@ uint8_t readPCBit() {
 
 void disablePCInt() {
     EIMSK_def &= ~EIMSK_OPTIC_VALUE;
-    DEBUG_PRINT("PC Int disabled\n");
+    // DEBUG_PRINT("PC Int disabled\n");
 }
 
 void enablePCInt() {
     EIMSK_def |= EIMSK_OPTIC_VALUE;
-    DEBUG_PRINT("PC Int enabled\n");
+    // DEBUG_PRINT("PC Int enabled\n");
 }
 
 void disableIRInt() {

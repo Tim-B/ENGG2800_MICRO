@@ -20,20 +20,18 @@ void updateDisplay() {
     setMinuteDisplay();
     setPMDisplay();
     setAlarmDisplay();
+    updateWeather(getWeather());
     DEBUG_PRINT("Display time: %i:%i\n", getHour(), getMinute());
 }
 
 void setHourDisplay() {
-    int pin = getHour() - 1;
+    int pin = getHour();
     setArray(pin, HIGH);
     toggleLED = pin;
 }
 
 void setMinuteDisplay() {
     int pin = getMinute() / 5;
-    if(pin < 0) {
-        pin = 11;
-    }
     setArray(pin, HIGH);
     if(pin == toggleLED) {
         cancelToggle = true;
@@ -43,7 +41,7 @@ void setMinuteDisplay() {
     DEBUG_PRINT("Minute pin: %i\n", pin);
     int minPin = getMinute() % 5;
     if(minPin > 0) {
-        setArray((minPin - 1) + 12, HIGH);
+        setArray(minPin + 11, HIGH);
         DEBUG_PRINT("5 Minute pin: %i\n", (minPin - 1) + 12);
     }
 }
