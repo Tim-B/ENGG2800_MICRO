@@ -124,7 +124,7 @@ void incrementHour() {
     if (tmpValue > 23) {
         tmpValue = 1;
     }
-    int displayIndex = tmpValue - 1;
+    int displayIndex = tmpValue;
     if (tmpValue < 12) {
         displayVal(displayIndex);
         pmLED(false);
@@ -198,19 +198,19 @@ void processProgressAlarm() {
     int tmpNewTime = 0;
     switch (stage) {
        case NO_COMMAND:
-            DEBUG_PRINT("Programming time\n");
-            stage = TIME_INNER_MINUTE;
+            DEBUG_PRINT("Programming alarm\n");
+            stage = ALARM_INNER_MINUTE;
             tmpValue = 0;
             newTime = 0;
             displayVal(0);
             break;
         case ALARM_INNER_MINUTE:
-            stage = TIME_OUTER_MINUTE;
+            stage = ALARM_OUTER_MINUTE;
             setNewTime(60 * tmpValue);
             tmpValue = 0;
             break;
         case ALARM_OUTER_MINUTE:
-            stage = TIME_HOUR;
+            stage = ALARM_HOUR;
             tmpNewTime = tmpValue;
             if(tmpNewTime > 11) {
                 tmpNewTime = 0;
@@ -224,7 +224,7 @@ void processProgressAlarm() {
             setNewTime(60 * 60 * tmpValue);
             setAlarm(newTime);
             refresh();
-            DEBUG_PRINT("New time: %lu\n", newTime);
+            DEBUG_PRINT("New alarm: %lu\n", newTime);
             break;
         default:
             break;
