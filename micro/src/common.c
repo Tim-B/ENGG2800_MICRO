@@ -5,7 +5,6 @@
 #include <util/delay.h>
 #include <stdlib.h>
 #include "inout.h"
-#include "pins.h"
 #include "timeutil.h"
 #include "control.h"
 
@@ -24,7 +23,6 @@ void setup() {
     // setupPins(); 
     // DEBUG_PRINT("START\n");
     setupSerial();
-    setupPins(); 
     setupArray();
     setupClock();
     setupControl();

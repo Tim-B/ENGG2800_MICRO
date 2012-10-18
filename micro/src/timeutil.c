@@ -2,6 +2,7 @@
 #include "inout.h"
 #include "display.h"
 #include <avr/interrupt.h>
+#include <avr/io.h>
 #include "timeutil.h"
 #include "common.h"
 

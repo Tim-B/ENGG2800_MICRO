@@ -1,9 +1,10 @@
 #include "timeutil.h"
 #include "inout.h"
-#include "pins.h"
 #include "display.h"
 #include "common.h"
 #include "control.h"
+#include <stdio.h>
+#include <avr/io.h>
 
 int toggleLED = 0;
 IOBit toggleState = LOW;

@@ -4,6 +4,7 @@
 #include <util/setbaud.h>
 #include <string.h> 
 #include <stdio.h>
+#include <avr/io.h>
 #include <util/delay.h>
 #include <stdbool.h>
 
