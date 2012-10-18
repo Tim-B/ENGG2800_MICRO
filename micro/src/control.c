@@ -21,6 +21,10 @@ uint32_t newTime = 0;
 bool IRwaiting = false;
 bool pcWaiting = false;
 
+/**
+ * Initializes the control component, sets the data direction registers
+ * on both the sensors and configures interrupts.
+ */
 void setupControl() {
     commandWaiting = 0;
     SENSOR_PORT &= ~SENSOR_DDR_MASK;
@@ -30,6 +34,12 @@ void setupControl() {
     DEBUG_PRINT("interrupt setup\n");
 }
 
+
+/**
+ * Debugging function used for outputting an array
+ * @param value an array to be printed.
+ * @param total The total number of elements in the array.
+ */
 void printArray(int *value, int total) {
     int i;
     for (i = 0; i < total; i++) {
@@ -37,11 +47,17 @@ void printArray(int *value, int total) {
     }
 }
 
+/**
+ * Interrupt vector for IR proramming.
+ */
 ISR(INT0_vect) {
     disableIRInt();
     IRwaiting = true;
 }
 
+/**
+ * Processes an incoming IR request, run when the IRwaiting flag is true.
+ */
 void IRIncomming() {
     int code = readCommand();
     if (code == 255) {
@@ -73,6 +89,10 @@ void IRIncomming() {
     enableIRInt();
 }
 
+
+/**
+ * Processes an increment of the current IR value.
+ */
 void processIncrement() {
     tmpValue++;
     switch (stage) {
@@ -100,6 +120,10 @@ void processIncrement() {
     }
 }
 
+/**
+ * Increments the inner 4 minute LEDs, starts at 0 (in which case no LEDs
+ * are displayed).
+ */
 void incrementInner() {
     if (tmpValue > 4) {
         tmpValue = 0;
@@ -111,6 +135,10 @@ void incrementInner() {
     }
 }
 
+/**
+ * Increments the outer ring to display minutes while programming (ie. 5 minute
+ * blocks).
+ */
 void incrementOuter() {
     if (tmpValue > 11) {
         tmpValue = 0;
@@ -119,6 +147,10 @@ void incrementOuter() {
 
 }
 
+/**
+ * Increments the hour display, includes displaying times greater than
+ * midday in which case the PM LED is illuminated.
+ */
 void incrementHour() {
     DEBUG_PRINT("TMPVal: %i\n", tmpValue);
     if (tmpValue > 23) {
@@ -134,12 +166,20 @@ void incrementHour() {
     }
 }
 
+/**
+ * Clears the LED array then sets an index to high.
+ * @param value The LED index to be illuminated.
+ */
 void displayVal(int value) {
     DEBUG_PRINT("Display: %i\n", value);
     clearArray();
     setArray(value, HIGH);
 }
 
+/**
+ * Toggles the alarm setting including displaying the alarm value on the
+ * alarm LED.
+ */
 void processToggleAlarm() {
     if (alarmActive()) {
         setAlarmActive(false);
@@ -152,6 +192,11 @@ void processToggleAlarm() {
     }
 }
 
+/**
+ * Handles the IR time programming progressing to the next "stage", or entering
+ * or exiting depending on where in the programming sequence the clock 
+ * currently is.
+ */
 void processProgressTime() {
     int tmpNewTime = 0;
     switch (stage) {
@@ -189,11 +234,21 @@ void processProgressTime() {
     }
 }
 
+/**
+ * Adds time to the temporary new time used to build a time up over the
+ * stages of the programming sequence.
+ * @param mult The value to be added.
+ */
 void setNewTime(uint16_t mult) {
     newTime += mult;
     DEBUG_PRINT("Time: %lu\n", newTime);
 }
 
+/**
+ * Handles the IR alarm time programming progressing to the next "stage", or entering
+ * or exiting depending on where in the programming sequence the clock 
+ * currently is.
+ */
 void processProgressAlarm() {
     int tmpNewTime = 0;
     switch (stage) {
@@ -231,6 +286,9 @@ void processProgressAlarm() {
     }
 }
 
+/**
+ * Cancels the current IR programming process
+ */
 void processCancel() {
     if (stage == NO_COMMAND) {
         return;
@@ -241,15 +299,26 @@ void processCancel() {
     DEBUG_PRINT("Programming cancelled\n");
 }
 
+/**
+ * Returns whether the clock is in programming mode.
+ * @return true if in programming mode, false otherwise
+ */
 bool isProgramming() {
     return !(stage == NO_COMMAND);
 }
 
+/**
+ * Optical interrupt
+ */
 ISR(INT1_vect) {
     disablePCInt();
     pcWaiting = true;
 }
 
+/**
+ * Processes an incoming PC programming request. Runs when the pcIncomming
+ * flag is true.
+ */
 void pcIncomming() {
     // updateWeather(SUNNY);
     
@@ -367,6 +436,12 @@ void pcIncomming() {
     programSuccess();
 }
 
+/**
+ * Checks for a valid start sequence. Ignores the first two bits and checks
+ * the last six for a match. Returns as soon as a match is found regardless
+ * of if 8 bits have been read.
+ * @return true if a match found, false otherwise
+ */
 bool checkStart() {
     int output = 0;
     int i;
@@ -384,6 +459,10 @@ bool checkStart() {
     return false;
 }
 
+/**
+ * Reads 8 bits from the optical input
+ * @return an integer representation of the 8 buts read
+ */
 uint8_t readPCWord() {
     uint8_t output = 0;
     int i;
@@ -396,17 +475,28 @@ uint8_t readPCWord() {
     return output;
 }
 
+/**
+ * Indicates programming failed and enables optical interrupts again
+ */
 void programFailed() {
     // DEBUG_PRINT("PC Programming failed\n");
     pcWaiting = false;
     enablePCInt();
 }
 
+/**
+ * Indicates programming was successful and enables optical interrupts again
+ */
 void programSuccess() {
     pcWaiting = false;
     enablePCInt();
 }
 
+/**
+ * Reads a bit from the optical input. Takes 8 readings and averages them
+ * to determine the value
+ * @return 1 if high, 0 otherwise
+ */
 uint8_t readPCBit() {
     int avgCount = 0;
     int value = 0;
@@ -428,26 +518,43 @@ uint8_t readPCBit() {
     }
 }
 
+/**
+ * Disables the optical interrupt
+ */
 void disablePCInt() {
     EIMSK_def &= ~EIMSK_OPTIC_VALUE;
     // DEBUG_PRINT("PC Int disabled\n");
 }
 
+/**
+ * Enables the optical interrupt
+ */
 void enablePCInt() {
     EIMSK_def |= EIMSK_OPTIC_VALUE;
     // DEBUG_PRINT("PC Int enabled\n");
 }
 
+/**
+ * Disables the IR interrupt
+ */
 void disableIRInt() {
     EIMSK_def &= ~EIMSK_IR_VALUE;
     // DEBUG_PRINT("IRInt disabled\n");
 }
 
+/**
+ * Enables the IR interrupt
+ */
 void enableIRInt() {
     EIMSK_def |= EIMSK_IR_VALUE;
     // DEBUG_PRINT("IR Int enabled\n");
 }
 
+/**
+ * Reads 8 bits from the IR input, takes the average of 8 readings for each
+ * bit.
+ * @return an 8 bit integer representation of the code. 
+ */
 int readCommand() {
     int command = 0;
     int highCount = 0;
@@ -470,6 +577,10 @@ int readCommand() {
     return command;
 }
 
+/**
+ * Checks if there is an incoming IR or optical signal and if so trigger
+ * the processing.
+ */
 void cycle() {
     if (IRwaiting) {
         IRIncomming();

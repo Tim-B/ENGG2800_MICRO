@@ -11,6 +11,10 @@ IOBit buzzerOn = HIGH;
 int alarmCount = 0;
 bool cancelToggle = false;
 
+/**
+ * If the clock isn't in programming mode, clear the display then set the
+ * hours, minutes, PM, alarm and weather
+ */
 void updateDisplay() {
     if(isProgramming()) {
         return;
@@ -24,12 +28,20 @@ void updateDisplay() {
     DEBUG_PRINT("Display time: %i:%i\n", getHour(), getMinute());
 }
 
+/**
+ * Sets the hour array index to the current hour value
+ */
 void setHourDisplay() {
     int pin = getHour();
     setArray(pin, HIGH);
     toggleLED = pin;
 }
 
+/**
+ * Sets both the outer and the inner minute LEDs, sets the outer minute to the
+ * toggleLED value and if the minute and hour are aligned sets cancelToggle
+ * to true.
+ */
 void setMinuteDisplay() {
     int pin = getMinute() / 5;
     setArray(pin, HIGH);
@@ -46,6 +58,14 @@ void setMinuteDisplay() {
     }
 }
 
+/**
+ * If not in programming mode and the toggle isn't canceled it toggles
+ * the toggleLED
+ * 
+ * Also toggles the middle weather LED if in programming mode.
+ * 
+ * If the buzzer is on then the buzzer is toggled and alarmCount incremented.
+ */
 void toggle() {
     if(!isProgramming()) {
         if(!cancelToggle) {
@@ -77,15 +97,25 @@ void toggle() {
     }
 }
 
+/**
+ * Starts the buzzer sounding
+ * @param value the value for buzzerOn
+ */
 void setBuzzerOn(IOBit value) {
     buzzerOn = value;
     alarmCount = 0;
 }
 
+/**
+ * Sets the PM led if the time is PM
+ */
 void setPMDisplay() {
     pmLED(isPM());
 }
 
+/**
+ * Sets the alarm LED if the alarm is active
+ */
 void setAlarmDisplay() {
     if (alarmActive()) {
         alarmLED(HIGH);
@@ -94,6 +124,10 @@ void setAlarmDisplay() {
     }
 }
 
+/**
+ * Sets the respective weather LED
+ * @param value The weather value to be set.
+ */
 void updateWeather(Weather value) {
     WEATHER_PORT &= ~WEATHER_CLEAR_MASK;
     switch(value) {

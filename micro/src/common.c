@@ -13,6 +13,11 @@ int step = 0;
 char* string;
 int count = 0;
 int old = 0;
+
+/**
+ * Run once at the start of the application.
+ * Initializes pins, clock, IO, etc.
+ */
 void setup() {
     // DDRE = 0x00;
     // setupSerial();
@@ -28,6 +33,10 @@ void setup() {
     sei();
 }
 
+
+/**
+ * Run continuously in a loop.
+ */
 void loop() {
     cycle();
 /*

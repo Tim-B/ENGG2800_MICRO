@@ -2,7 +2,9 @@
 #include "pins.h"
 #include "inout.h"
 
-
+/**
+ * Depreciated.
+ */
 void setupPins() {
         directionPorts[B] = &DDRB;
         directionPorts[C] = &DDRC;
