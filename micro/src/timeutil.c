@@ -16,6 +16,7 @@ uint8_t hours = 0;
 bool alarmOn = false;
 Weather weatherValue = NONE;
 bool toggleBit = false;
+bool updateWaiting = false;
 
 volatile uint8_t tot_overflow;
 void refresh();
@@ -48,8 +49,16 @@ void setupClock() {
  */
 ISR(TIMER1_COMPA_vect) {
     time++;
+    updateWaiting = true;
     // DEBUG_PRINT("Time: %lu\n", time);
     
+
+}
+
+/**
+ * Runs any operations that need to be performed every second
+ */
+void checkTimeUpdate() {
     if(time >= 86400) {
         time = 0;
         refresh();
@@ -57,6 +66,16 @@ ISR(TIMER1_COMPA_vect) {
         refresh();
     }
     toggle();
+    updateWaiting = false;
+}
+
+/**
+ * Checks if there are any periodical tasks waiting
+ */
+void timeCycle() {
+    if(updateWaiting) {
+        checkTimeUpdate();
+    }
 }
 
 /**

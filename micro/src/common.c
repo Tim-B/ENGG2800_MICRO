@@ -37,6 +37,7 @@ void setup() {
  */
 void loop() {
     cycle();
+    timeCycle();
 /*
     if(PIND & 0x08) {
         DEBUG_PRINT("High\n");
