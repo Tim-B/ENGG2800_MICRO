@@ -40,7 +40,7 @@ void setupClock() {
     // setTime(11520);
     setTime(0);
     alarmTime = 120;
-    refresh();
+    // refresh();
 }
 
 /**
@@ -49,20 +49,18 @@ void setupClock() {
  */
 ISR(TIMER1_COMPA_vect) {
     time++;
+    if(time >= 86400) {
+        time = 0;
+    }
     updateWaiting = true;
-    // DEBUG_PRINT("Time: %lu\n", time);
-    
-
+    // DEBUG_PRINT("%lu\n", time);
 }
 
 /**
  * Runs any operations that need to be performed every second
  */
 void checkTimeUpdate() {
-    if(time >= 86400) {
-        time = 0;
-        refresh();
-    } else if(time >= nextUpdate) {
+    if((time == 0) || (time >= nextUpdate)) {
         refresh();
     }
     toggle();

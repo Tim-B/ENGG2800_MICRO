@@ -22,13 +22,15 @@ void setup() {
     // setupSerial();
     // setupPins(); 
     // DEBUG_PRINT("START\n");
+    
     setupSerial();
     setupArray();
     setupClock();
     setupControl();
-    DEBUG_PRINT("START\n");
+    
     // DDRD &= ~0x08;
     sei();
+    // DEBUG_PRINT("START\n");
 }
 
 
@@ -36,29 +38,7 @@ void setup() {
  * Run continuously in a loop.
  */
 void loop() {
+    // DEBUG_PRINT("TICK\n");
     cycle();
     timeCycle();
-/*
-    if(PIND & 0x08) {
-        DEBUG_PRINT("High\n");
-    } else {
-        DEBUG_PRINT("LOW\n");
-    }
-*/
-    // _delay_ms(1000);
-/*
-    clearArray();
-    setArray(count, HIGH);
-    _delay_ms(2000);
-    if(count == 0) {
-        clearArray();
-        _delay_ms(1000);
-        setArray(count, HIGH);
-        _delay_ms(1000);
-    }
-    count++;
-    if(count > 15) {
-        count = 0;
-    }
-*/
 }

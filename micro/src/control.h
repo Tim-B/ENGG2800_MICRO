@@ -26,7 +26,7 @@
     void incrementInner();
     void incrementOuter();
     void displayVal(int value);
-    void setNewTime();
+    void setNewTime(uint32_t);
     bool isProgramming();
     bool checkStart();
     void processCancel();

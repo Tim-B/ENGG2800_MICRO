@@ -63,8 +63,6 @@ void IRIncomming() {
     if (code == 255) {
         IRwaiting = false;
         enableIRInt();
-        
-        // DEBUG_PRINT("wrong code mate\n");
         return;
     }
     switch (code) {
@@ -152,16 +150,16 @@ void incrementOuter() {
  * midday in which case the PM LED is illuminated.
  */
 void incrementHour() {
-    DEBUG_PRINT("TMPVal: %i\n", tmpValue);
+    // DEBUG_PRINT("TMPVal: %i\n", tmpValue);
     if (tmpValue > 23) {
-        tmpValue = 1;
+        tmpValue = 0;
     }
     int displayIndex = tmpValue;
     if (tmpValue < 12) {
         displayVal(displayIndex);
         pmLED(false);
     } else {
-        displayVal(displayIndex - 11);
+        displayVal(displayIndex - 12);
         pmLED(true);
     }
 }
@@ -205,12 +203,13 @@ void processProgressTime() {
             stage = TIME_INNER_MINUTE;
             tmpValue = 0;
             newTime = 0;
-            displayVal(0);
+            clearArray();
             break;
         case TIME_INNER_MINUTE:
             stage = TIME_OUTER_MINUTE;
-            setNewTime(60 * tmpValue);
+            setNewTime((uint32_t) 60 * tmpValue);
             tmpValue = 0;
+            displayVal(tmpValue);
             break;
         case TIME_OUTER_MINUTE:
             stage = TIME_HOUR;
@@ -218,13 +217,13 @@ void processProgressTime() {
             if(tmpNewTime > 11) {
                 tmpNewTime = 0;
             }
-            setNewTime(60 * 5 * tmpNewTime);
+            setNewTime((uint32_t) 60 * 5 * tmpNewTime);
             tmpValue = 0;
             displayVal(tmpValue);
             break;
         case TIME_HOUR:
             stage = NO_COMMAND;
-            setNewTime(60 * 60 * tmpValue);
+            setNewTime((uint32_t) 60 * 60 * tmpValue);
             setTime(newTime);
             refresh();
             DEBUG_PRINT("New time: %lu\n", newTime);
@@ -239,8 +238,8 @@ void processProgressTime() {
  * stages of the programming sequence.
  * @param mult The value to be added.
  */
-void setNewTime(uint16_t mult) {
-    newTime += mult;
+void setNewTime(uint32_t mult) {
+    newTime = newTime + mult;
     DEBUG_PRINT("Time: %lu\n", newTime);
 }
 
@@ -257,12 +256,13 @@ void processProgressAlarm() {
             stage = ALARM_INNER_MINUTE;
             tmpValue = 0;
             newTime = 0;
-            displayVal(0);
+            clearArray();
             break;
         case ALARM_INNER_MINUTE:
             stage = ALARM_OUTER_MINUTE;
-            setNewTime(60 * tmpValue);
+            setNewTime((uint32_t) 60 * tmpValue);
             tmpValue = 0;
+            displayVal(tmpValue);
             break;
         case ALARM_OUTER_MINUTE:
             stage = ALARM_HOUR;
@@ -270,13 +270,13 @@ void processProgressAlarm() {
             if(tmpNewTime > 11) {
                 tmpNewTime = 0;
             }
-            setNewTime(60 * 5 * tmpNewTime);
+            setNewTime((uint32_t) 60 * 5 * tmpNewTime);
             tmpValue = 0;
             displayVal(tmpValue);
             break;
         case ALARM_HOUR:
             stage = NO_COMMAND;
-            setNewTime(60 * 60 * tmpValue);
+            setNewTime((uint32_t) 60 * 60 * tmpValue);
             setAlarm(newTime);
             refresh();
             DEBUG_PRINT("New alarm: %lu\n", newTime);
@@ -383,10 +383,10 @@ void pcIncomming() {
     uint32_t newTime = ((uint32_t) time1 << 8) | ((uint32_t) time2);
     uint32_t newAlarm = ((uint32_t) alarm1 << 8) | ((uint32_t) alarm2);
 
-    setTime(newTime);
+    setTime(newTime * 60);
     
     if (settings & 0x80) {
-        setAlarm(newAlarm);
+        setAlarm(newAlarm * 60);
         DEBUG_PRINT("Alarm set\n");
     }
 
