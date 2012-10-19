@@ -510,7 +510,7 @@ uint8_t readPCBit() {
         }
         _delay_ms(PC_SAMPLE);
     }
-    _delay_ms(43);
+    _delay_ms(42);
     if (avgCount > 4) {
         return 1;
     } else {
