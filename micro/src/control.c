@@ -19,7 +19,12 @@ int tmpValue = 0;
 Stage stage = NO_COMMAND;
 uint32_t newTime = 0;
 bool IRwaiting = false;
+bool pcWaiting = false;
 
+/**
+ * Initializes the control component, sets the data direction registers
+ * on both the sensors and configures interrupts.
+ */
 void setupControl() {
     commandWaiting = 0;
     SENSOR_PORT &= ~SENSOR_DDR_MASK;
@@ -29,6 +34,12 @@ void setupControl() {
     DEBUG_PRINT("interrupt setup\n");
 }
 
+
+/**
+ * Debugging function used for outputting an array
+ * @param value an array to be printed.
+ * @param total The total number of elements in the array.
+ */
 void printArray(int *value, int total) {
     int i;
     for (i = 0; i < total; i++) {
@@ -36,11 +47,17 @@ void printArray(int *value, int total) {
     }
 }
 
+/**
+ * Interrupt vector for IR proramming.
+ */
 ISR(INT0_vect) {
     disableIRInt();
-    IRwaiting= true;
+    IRwaiting = true;
 }
 
+/**
+ * Processes an incoming IR request, run when the IRwaiting flag is true.
+ */
 void IRIncomming() {
     int code = readCommand();
     if (code == 255) {
@@ -72,6 +89,10 @@ void IRIncomming() {
     enableIRInt();
 }
 
+
+/**
+ * Processes an increment of the current IR value.
+ */
 void processIncrement() {
     tmpValue++;
     switch (stage) {
@@ -99,6 +120,10 @@ void processIncrement() {
     }
 }
 
+/**
+ * Increments the inner 4 minute LEDs, starts at 0 (in which case no LEDs
+ * are displayed).
+ */
 void incrementInner() {
     if (tmpValue > 4) {
         tmpValue = 0;
@@ -110,6 +135,10 @@ void incrementInner() {
     }
 }
 
+/**
+ * Increments the outer ring to display minutes while programming (ie. 5 minute
+ * blocks).
+ */
 void incrementOuter() {
     if (tmpValue > 11) {
         tmpValue = 0;
@@ -118,12 +147,16 @@ void incrementOuter() {
 
 }
 
+/**
+ * Increments the hour display, includes displaying times greater than
+ * midday in which case the PM LED is illuminated.
+ */
 void incrementHour() {
     DEBUG_PRINT("TMPVal: %i\n", tmpValue);
     if (tmpValue > 23) {
         tmpValue = 1;
     }
-    int displayIndex = tmpValue - 1;
+    int displayIndex = tmpValue;
     if (tmpValue < 12) {
         displayVal(displayIndex);
         pmLED(false);
@@ -133,12 +166,20 @@ void incrementHour() {
     }
 }
 
+/**
+ * Clears the LED array then sets an index to high.
+ * @param value The LED index to be illuminated.
+ */
 void displayVal(int value) {
     DEBUG_PRINT("Display: %i\n", value);
     clearArray();
     setArray(value, HIGH);
 }
 
+/**
+ * Toggles the alarm setting including displaying the alarm value on the
+ * alarm LED.
+ */
 void processToggleAlarm() {
     if (alarmActive()) {
         setAlarmActive(false);
@@ -151,6 +192,11 @@ void processToggleAlarm() {
     }
 }
 
+/**
+ * Handles the IR time programming progressing to the next "stage", or entering
+ * or exiting depending on where in the programming sequence the clock 
+ * currently is.
+ */
 void processProgressTime() {
     int tmpNewTime = 0;
     switch (stage) {
@@ -168,12 +214,12 @@ void processProgressTime() {
             break;
         case TIME_OUTER_MINUTE:
             stage = TIME_HOUR;
-            tmpNewTime = tmpValue + 1;
+            tmpNewTime = tmpValue;
             if(tmpNewTime > 11) {
                 tmpNewTime = 0;
             }
             setNewTime(60 * 5 * tmpNewTime);
-            tmpValue = 1;
+            tmpValue = 0;
             displayVal(tmpValue);
             break;
         case TIME_HOUR:
@@ -188,39 +234,61 @@ void processProgressTime() {
     }
 }
 
+/**
+ * Adds time to the temporary new time used to build a time up over the
+ * stages of the programming sequence.
+ * @param mult The value to be added.
+ */
 void setNewTime(uint16_t mult) {
     newTime += mult;
     DEBUG_PRINT("Time: %lu\n", newTime);
 }
 
+/**
+ * Handles the IR alarm time programming progressing to the next "stage", or entering
+ * or exiting depending on where in the programming sequence the clock 
+ * currently is.
+ */
 void processProgressAlarm() {
+    int tmpNewTime = 0;
     switch (stage) {
-        case NO_COMMAND:
+       case NO_COMMAND:
+            DEBUG_PRINT("Programming alarm\n");
             stage = ALARM_INNER_MINUTE;
-            newTime = 0;
             tmpValue = 0;
+            newTime = 0;
             displayVal(0);
             break;
         case ALARM_INNER_MINUTE:
             stage = ALARM_OUTER_MINUTE;
-            setNewTime(60);
+            setNewTime(60 * tmpValue);
+            tmpValue = 0;
             break;
         case ALARM_OUTER_MINUTE:
             stage = ALARM_HOUR;
-            setNewTime(60 * 5);
+            tmpNewTime = tmpValue;
+            if(tmpNewTime > 11) {
+                tmpNewTime = 0;
+            }
+            setNewTime(60 * 5 * tmpNewTime);
+            tmpValue = 0;
+            displayVal(tmpValue);
             break;
         case ALARM_HOUR:
             stage = NO_COMMAND;
-            setNewTime(60 * 60);
+            setNewTime(60 * 60 * tmpValue);
             setAlarm(newTime);
             refresh();
-            updateDisplay();
+            DEBUG_PRINT("New alarm: %lu\n", newTime);
             break;
         default:
             break;
     }
 }
 
+/**
+ * Cancels the current IR programming process
+ */
 void processCancel() {
     if (stage == NO_COMMAND) {
         return;
@@ -231,12 +299,31 @@ void processCancel() {
     DEBUG_PRINT("Programming cancelled\n");
 }
 
+/**
+ * Returns whether the clock is in programming mode.
+ * @return true if in programming mode, false otherwise
+ */
 bool isProgramming() {
     return !(stage == NO_COMMAND);
 }
 
+/**
+ * Optical interrupt
+ */
 ISR(INT1_vect) {
+    disablePCInt();
+    pcWaiting = true;
+}
+
+/**
+ * Processes an incoming PC programming request. Runs when the pcIncomming
+ * flag is true.
+ */
+void pcIncomming() {
+    // updateWeather(SUNNY);
+    
     if (!checkStart()) {
+        // updateWeather(RAINY);
         programFailed();
         // DEBUG_PRINT("prigram not thing\n");
         return;
@@ -297,34 +384,43 @@ ISR(INT1_vect) {
     uint32_t newAlarm = ((uint32_t) alarm1 << 8) | ((uint32_t) alarm2);
 
     setTime(newTime);
-    refresh();
-    updateDisplay();
-
-    if (settings & 0x01) {
+    
+    if (settings & 0x80) {
         setAlarm(newAlarm);
+        DEBUG_PRINT("Alarm set\n");
     }
 
-    if (settings & 0x02) {
+    if (settings & 0x40) {
         setAlarmActive(1);
+        DEBUG_PRINT("Alarm active\n");
     } else {
         setAlarmActive(0);
     }
 
-    int weather = (settings & 0x18) >> 3;
-    switch (weather) {
-        case 0x01:
-            setWeather(SUNNY);
-            break;
-        case 0x02:
-            setWeather(CLOUDY);
-            break;
-        case 0x03:
-            setWeather(RAINY);
-            break;
-        default:
-            setWeather(NONE);
-            break;
+    if(settings & 0x20) {
+        int weather = (settings & 0x18) >> 3;
+        DEBUG_PRINT("Weather: %i\n", weather);
+        switch (weather) {
+            case 0x00:
+                setWeather(SUNNY);
+                DEBUG_PRINT("Sunneh\n");
+                break;
+            case 0x01:
+                setWeather(CLOUDY);
+                DEBUG_PRINT("Cloudeh\n");
+                break;
+            case 0x02:
+                DEBUG_PRINT("Raineh\n");
+                setWeather(RAINY);
+                break;
+            default:
+                setWeather(NONE);
+                break;
+        }
     }
+    
+    
+    refresh();
 
     DEBUG_PRINT("Time1: %u, Time2: %u, Full: %lu\n", time1, time2, newTime);
     DEBUG_PRINT("Alarm1: %u, Alarm2: %u, Full: %lu\n", alarm1, alarm2, newAlarm);
@@ -334,10 +430,18 @@ ISR(INT1_vect) {
     DEBUG_PRINT("Check Alarm1: %u, Alarm2: %u\n", alarm1_check, alarm2_check);
     DEBUG_PRINT("Check Settings: %u\n", settings_check);
     DEBUG_PRINT("Check end: %u\n", end_check);
-
+    
+    
+    // updateWeather(NONE);
     programSuccess();
 }
 
+/**
+ * Checks for a valid start sequence. Ignores the first two bits and checks
+ * the last six for a match. Returns as soon as a match is found regardless
+ * of if 8 bits have been read.
+ * @return true if a match found, false otherwise
+ */
 bool checkStart() {
     int output = 0;
     int i;
@@ -355,6 +459,10 @@ bool checkStart() {
     return false;
 }
 
+/**
+ * Reads 8 bits from the optical input
+ * @return an integer representation of the 8 buts read
+ */
 uint8_t readPCWord() {
     uint8_t output = 0;
     int i;
@@ -367,20 +475,34 @@ uint8_t readPCWord() {
     return output;
 }
 
+/**
+ * Indicates programming failed and enables optical interrupts again
+ */
 void programFailed() {
     // DEBUG_PRINT("PC Programming failed\n");
+    pcWaiting = false;
+    enablePCInt();
 }
 
+/**
+ * Indicates programming was successful and enables optical interrupts again
+ */
 void programSuccess() {
-
+    pcWaiting = false;
+    enablePCInt();
 }
 
+/**
+ * Reads a bit from the optical input. Takes 8 readings and averages them
+ * to determine the value
+ * @return 1 if high, 0 otherwise
+ */
 uint8_t readPCBit() {
     int avgCount = 0;
     int value = 0;
     int i;
     // _delay_ms(24);
-    _delay_ms(42);
+    _delay_ms(43);
     for (i = 0; i < 8; i++) {
         value = SENSOR_PIN & SENSOR_OPTICAL_MASK;
         if (value) {
@@ -390,32 +512,49 @@ uint8_t readPCBit() {
     }
     _delay_ms(43);
     if (avgCount > 4) {
-        return 0;
-    } else {
         return 1;
+    } else {
+        return 0;
     }
 }
 
+/**
+ * Disables the optical interrupt
+ */
 void disablePCInt() {
     EIMSK_def &= ~EIMSK_OPTIC_VALUE;
     // DEBUG_PRINT("PC Int disabled\n");
 }
 
+/**
+ * Enables the optical interrupt
+ */
 void enablePCInt() {
     EIMSK_def |= EIMSK_OPTIC_VALUE;
     // DEBUG_PRINT("PC Int enabled\n");
 }
 
+/**
+ * Disables the IR interrupt
+ */
 void disableIRInt() {
     EIMSK_def &= ~EIMSK_IR_VALUE;
     // DEBUG_PRINT("IRInt disabled\n");
 }
 
+/**
+ * Enables the IR interrupt
+ */
 void enableIRInt() {
     EIMSK_def |= EIMSK_IR_VALUE;
     // DEBUG_PRINT("IR Int enabled\n");
 }
 
+/**
+ * Reads 8 bits from the IR input, takes the average of 8 readings for each
+ * bit.
+ * @return an 8 bit integer representation of the code. 
+ */
 int readCommand() {
     int command = 0;
     int highCount = 0;
@@ -438,8 +577,15 @@ int readCommand() {
     return command;
 }
 
+/**
+ * Checks if there is an incoming IR or optical signal and if so trigger
+ * the processing.
+ */
 void cycle() {
     if (IRwaiting) {
         IRIncomming();
+    }
+    if (pcWaiting) {
+        pcIncomming();
     }
 }

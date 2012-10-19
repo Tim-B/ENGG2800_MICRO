@@ -8,7 +8,7 @@
 #ifndef COMMON_H
     #define COMMON_H
     #include <stdio.h>
-    #define DEBUG
+    
     #define TEST
 
     #ifdef DEBUG
@@ -118,7 +118,7 @@
         #define WEATHER_RAINY 0x04
         #define SENSOR_PORT PORTD
         #define SENSOR_DDR_MASK 0x0C
-        #define CLOCK_COUNT 34285
+        #define CLOCK_COUNT 34286
         #define SENSOR_IR_MASK 0x04
     #endif
 

@@ -4,6 +4,7 @@
 #include <util/setbaud.h>
 #include <string.h> 
 #include <stdio.h>
+#include <avr/io.h>
 #include <util/delay.h>
 #include <stdbool.h>
 
@@ -11,6 +12,9 @@
 int serialPutChar(char c, FILE *stream);
 FILE uart_output = FDEV_SETUP_STREAM(serialPutChar, NULL, _FDEV_SETUP_WRITE);
 
+/**
+ * Sets up the serial connection.
+ */
 void setupSerial() {
     UBRRH_def = UBRRH_VALUE;
     UBRRL_def = UBRRL_VALUE;
@@ -27,6 +31,12 @@ void setupSerial() {
     stdout = &uart_output;
 }
 
+/**
+ * Prints a character to serial
+ * @param c The character to print
+ * @param stream The IO streme
+ * @return always 0
+ */
 int serialPutChar(char c, FILE *stream) {
     if (c == '\n') {
         serialPutChar('\r', stream);
@@ -36,6 +46,10 @@ int serialPutChar(char c, FILE *stream) {
     return 0;
 }
 
+/**
+ * Sets the alarm LED
+ * @param on If true then the LED is on, off otherwise
+ */
 void alarmLED(bool on) {
     if(on) {
         ALARM_LED_PORT |= ALARM_LED_VALUE;
@@ -44,6 +58,10 @@ void alarmLED(bool on) {
     }
 }
 
+/**
+ * Sets the PM led
+ * @param on If true then the LED is on, off otherwise
+ */
 void pmLED(bool on) {
     if(on) {
         PM_LED_PORT |= PM_LED_VALUE;
@@ -52,6 +70,10 @@ void pmLED(bool on) {
     }
 }
 
+/**
+ * Sets the buzzer on or off
+ * @param on On if HIGH, off otherwise
+ */
 void buzzer(IOBit on) {
     if(on == HIGH) {
         ALARM_BUZZER_PORT |= ALARM_BUZZER_VALUE;
@@ -62,22 +84,26 @@ void buzzer(IOBit on) {
     }
 }
 
+/**
+ * Initializes the LED array and latches.
+ */
 void setupArray() {
     DDRC |= ALARM_BUZZER_VALUE;
     DDRC |= ALARM_LED_VALUE;
     DDRC |= PM_LED_VALUE;
-    latchAddressTranslate[0] = 5;
-    latchAddressTranslate[1] = 7;
-    latchAddressTranslate[2] = 12;
-    latchAddressTranslate[3] = 8;
-    latchAddressTranslate[4] = 10;
-    latchAddressTranslate[5] = 14;
-    latchAddressTranslate[6] = 11;
-    latchAddressTranslate[7] = 13;
-    latchAddressTranslate[8] = 1;
-    latchAddressTranslate[9] = 6;
-    latchAddressTranslate[10] = 2;
-    latchAddressTranslate[11] = 4;
+    DDRC |= 0x07;
+    latchAddressTranslate[0] = 4;
+    latchAddressTranslate[1] = 5;
+    latchAddressTranslate[2] = 7;
+    latchAddressTranslate[3] = 12;
+    latchAddressTranslate[4] = 8;
+    latchAddressTranslate[5] = 10;
+    latchAddressTranslate[6] = 14;
+    latchAddressTranslate[7] = 11;
+    latchAddressTranslate[8] = 13;
+    latchAddressTranslate[9] = 1;
+    latchAddressTranslate[10] = 6;
+    latchAddressTranslate[11] = 2;
     latchAddressTranslate[12] = 15;
     latchAddressTranslate[13] = 9;
     latchAddressTranslate[14] = 0;
@@ -92,6 +118,9 @@ void setupArray() {
     // setArray(3, HIGH);
 }
 
+/**
+ * Clears the LED array;
+ */
 void clearArray() {
     // Long, but make sure the bits are set correctly
     LATCH_PORT1 = (LATCH_PORT1 & ~LATCH1_MEMORY) | LATCH1_CLEAR;
@@ -102,6 +131,11 @@ void clearArray() {
     // DEBUG_PRINT("Cleared\n");
 }
 
+/**
+ * Sets an LED in the array
+ * @param value The index to be set
+ * @param mode if HIGH set the LED on, off otherwise
+ */
 void setArray(int value, IOMode mode) {
     value = latchAddressTranslate[value];
 

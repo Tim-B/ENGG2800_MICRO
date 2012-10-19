@@ -21,6 +21,9 @@ void setTime(uint32_t);
 void setWeather(Weather);
 void setAlarm(uint32_t);
 void refresh();
+void checkTimeUpdate();
+void timeCycle();
+Weather getWeather();
 
 #endif	/* TIMEUTIL_H */
 
