@@ -323,8 +323,9 @@ void pcIncomming() {
     // updateWeather(SUNNY);
     
     if (!checkStart()) {
-        // updateWeather(RAINY);
+        
         programFailed();
+        // updateWeather(RAINY);
         // DEBUG_PRINT("prigram not thing\n");
         return;
     }
@@ -357,24 +358,32 @@ void pcIncomming() {
 
     if ((~alarm1_check & 0x00FF) != alarm1) {
         DEBUG_PRINT("Alarm check 1 failed\n");
+        clearArray();
+        setArray(3, HIGH);
         programFailed();
         return;
     }
 
     if ((~alarm2_check & 0x00FF) != alarm2) {
         DEBUG_PRINT("Alarm check 2 failed\n");
+        clearArray();
+        setArray(4, HIGH);        
         programFailed();
         return;
     }
 
     if ((~settings_check & 0x00FF) != settings) {
         DEBUG_PRINT("Settings failed failed\n");
+        clearArray();
+        setArray(5, HIGH);        
         programFailed();
         return;
     }
     
     
     if ((~end_check & 0x00FF) != 0b01101011) {
+        clearArray();
+        setArray(6, HIGH);        
         DEBUG_PRINT("End check failed\n");
         programFailed();
         return;
@@ -480,6 +489,7 @@ uint8_t readPCWord() {
  */
 void programFailed() {
     // DEBUG_PRINT("PC Programming failed\n");
+    _delay_ms(1000);
     pcWaiting = false;
     enablePCInt();
 }
@@ -510,7 +520,7 @@ uint8_t readPCBit() {
         }
         _delay_ms(PC_SAMPLE);
     }
-    _delay_ms(42);
+    _delay_ms(44);
     if (avgCount > 4) {
         return 1;
     } else {
