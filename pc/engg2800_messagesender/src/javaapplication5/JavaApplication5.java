@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -58,7 +59,10 @@ public class JavaApplication5 extends JFrame {
         addWindowListener(new ExitListener());
         Container content = getContentPane();
         content.setBackground(Color.lightGray);
-        JPanel controlArea = new JPanel(new GridLayout(3, 1));
+        GridBagConstraints c = new GridBagConstraints();
+        JPanel controlArea = new JPanel(new GridBagLayout());
+        controlArea.setBorder(new EmptyBorder(10, 10, 10, 10) );
+        this.setResizable(false);
         String[] labels = {"Alarm Hour", "Alarm Minute",
             "Clock Hour", "Clock Minute"};
         char[] mnemonics = {'F', 'M', 'L', 'A'};
@@ -67,23 +71,57 @@ public class JavaApplication5 extends JFrame {
             "Must be in 24 hour time, between 0 and 59", 
             "Must be in 24 hour time, between 0 and 23", 
             "Must be in 24 hour time, between 0 and 59"};
+        
         final TextForm form = new TextForm(labels, mnemonics, widths, descs);
-        controlArea.add(form);
+        c.fill = GridBagConstraints.CENTER;
+        c.gridheight = 1;
+        c.gridwidth = 1;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        
+        JLabel timeLabel = new JLabel("Time settings");
+        timeLabel.setFont(new Font("Sans Serif", Font.BOLD, 12));
+        timeLabel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,Color.BLACK));
+        controlArea.add(timeLabel, c);
+        
+        c.gridx = 0;
+        c.gridy = 1;  
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        controlArea.add(form, c);
+        
+        c.gridx = 0;
+         
+        c.gridwidth = 1;
+        c.gridheight = 1;
         JCheckBox weatherCheck = new JCheckBox("Set Weather");
         JCheckBox alarmCheck = new JCheckBox("Set Alarm");
         JCheckBox activeAlarmCheck = new JCheckBox("Alarm Active");
-
-        controlArea.add(weatherCheck);
-        controlArea.add(alarmCheck);
-        controlArea.add(activeAlarmCheck);
-
+        
+        c.gridy = 2; 
+        JLabel settingsLabel = new JLabel("Other settings");
+        settingsLabel.setFont(new Font("Sans Serif", Font.BOLD, 12));
+        settingsLabel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,Color.BLACK));
+        controlArea.add(settingsLabel, c);
+        
+        c.gridy = 3; 
+        controlArea.add(weatherCheck, c);
+        c.gridy = 4;
+        controlArea.add(alarmCheck, c);
+        c.gridy = 5;
+        controlArea.add(activeAlarmCheck, c);
+        
         JButton submit = new JButton("Program Clock");
-
-        controlArea.add(submit);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridwidth = 2;
+        c.gridx = 0;
+        c.gridy = 6;
+        controlArea.add(submit, c);
         content.add(controlArea, BorderLayout.EAST);
 
         final JPanel drawingArea = new JPanel();
-        drawingArea.setPreferredSize(new Dimension(400, 0));
+        drawingArea.setPreferredSize(new Dimension(400, 400));
         drawingArea.setBorder(BorderFactory.createLineBorder(Color.black, 10));
         drawingArea.setBackground(Color.white);
 
