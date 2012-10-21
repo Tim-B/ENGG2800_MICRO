@@ -78,7 +78,7 @@ public class JavaApplication5 extends JFrame {
 
         JButton submit = new JButton("Program Clock");
 
-        controlArea.add(submit, BorderLayout.PAGE_END);
+        controlArea.add(submit);
         content.add(controlArea, BorderLayout.EAST);
 
         final JPanel drawingArea = new JPanel();
