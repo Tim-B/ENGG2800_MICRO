@@ -7,10 +7,13 @@ package javaapplication5;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.text.NumberFormatter;
 
 /**
  *
@@ -26,9 +29,19 @@ class TextForm extends JPanel {
         add(labelPanel, BorderLayout.WEST);
         add(fieldPanel, BorderLayout.CENTER);
         fields = new JTextField[labels.length];
-
+        NumberFormatter nf = new NumberFormatter();
+        nf.setMinimum(0);
+        nf.setMaximum(23);
+        NumberFormatter nf2 = new NumberFormatter();
+        nf2.setMinimum(0);
+        nf2.setMaximum(59);
         for (int i = 0; i < labels.length; i += 1) {
-          fields[i] = new JTextField();
+           if((i%2) == 0) {
+               fields[i] = new JFormattedTextField(nf);
+           } else {
+               fields[i] = new JFormattedTextField(nf2);
+           }
+          
           if (i < tips.length)
             fields[i].setToolTipText(tips[i]);
           if (i < widths.length)
