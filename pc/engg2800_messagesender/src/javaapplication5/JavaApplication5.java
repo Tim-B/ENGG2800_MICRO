@@ -146,7 +146,6 @@ public class JavaApplication5 extends JFrame {
                 temporaryList.addAll(form.getBinary(CLOCKHOURTEXT, CLOCKMINUTETEXT, LONGLENGTH));
                 temporaryList.addAll(form.getBinary(ALARMHOURTEXT, ALARMMINUTETEXT, LONGLENGTH));
                 list.addAll(temporaryList);
-                System.out.println(list.toString());
             }
         });
         while (true) {
@@ -162,11 +161,9 @@ public class JavaApplication5 extends JFrame {
             changeColor(list, RATE, drawingArea, LOWCOLOR, HIGHCOLOR);
             changeColor(startSequence, RATE, drawingArea, LOWCOLOR, HIGHCOLOR);
             long endTime = System.currentTimeMillis() - profileTime;
-            System.out.println(endTime);
             list.removeAll(list);
             drawingArea.setBackground(Color.white);
             JOptionPane.showMessageDialog(null, "Programmed!");
-            System.out.print("\n");
         }
     }
 
@@ -174,11 +171,9 @@ public class JavaApplication5 extends JFrame {
         for (int i : message) {
             if (i == 1) {
                 panel.setBackground(high);
-                // System.out.print("1");
 
             } else {
                 panel.setBackground(low);
-                // System.out.print("0");
             }
             try {
                 Thread.sleep(rate);
@@ -186,7 +181,6 @@ public class JavaApplication5 extends JFrame {
                 Logger.getLogger(JavaApplication5.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        // System.out.print("\n");
     }
 
     public ArrayList<Integer> addFlags(Boolean setWeather,
@@ -229,9 +223,6 @@ public class JavaApplication5 extends JFrame {
         list.add(0);
         list.add(0);
         list.add(0);
-
-
-        System.out.println(list.toString());
         return list;
     }
     

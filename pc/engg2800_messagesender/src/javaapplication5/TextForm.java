@@ -79,9 +79,7 @@ class TextForm extends JPanel {
             minuteInt = Integer.parseInt(fields[minute].getText());
         }
         int timeStamp = hourInt * 60 + minuteInt;
-        System.out.println("The timestamp is " + timeStamp);
         String binary = Integer.toBinaryString(timeStamp);
-        System.out.println(binary);
         char charArray[] = binary.toCharArray();
         int count = wordLength - charArray.length;
         int c = 0;
