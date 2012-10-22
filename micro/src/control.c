@@ -89,7 +89,7 @@ void IRIncomming() {
     }
     
     // Throttle IR command rate so that we don't get duplicate commands
-    _delay_ms(1000);
+    _delay_ms(500);
     
     IRwaiting = false;
     enableIRInt();
