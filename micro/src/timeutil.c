@@ -32,7 +32,7 @@ void setupClock() {
     TCNT1 = 0;
 
     // initialize compare value
-    OCR1A = 32375;
+    OCR1A = 32470;
 
     // enable compare interrupt
     TIMSK1 |= (1 << OCIE1A);
