@@ -42,7 +42,8 @@ public class JavaApplication5 extends JFrame {
     private static final int CLOCKMINUTETEXT = 3;
     private static final int TODAYFORECAST = 0;
     private static final int TOMMOROWFORECAST = 2;
-    private static final String WEATHERURL = "http://api.wunderground.com/api/ee6756280a23f6e9/forecast/q/YBBN.xml";
+    private static final String IPURL 
+            = "http://api.wunderground.com/api/ee6756280a23f6e9/geolookup/q/autoip.xml";
     private static final Color HIGHCOLOR = Color.WHITE;
     private static final Color LOWCOLOR = Color.BLACK;
 
@@ -233,32 +234,58 @@ public class JavaApplication5 extends JFrame {
         System.out.println(list.toString());
         return list;
     }
+    
+    public String getWeatherStation() {
 
-    public int getForecast() {
-        String forecast;
-        try {
-            URL forecastUrl = new URL(WEATHERURL);
-            InputStream openStream = forecastUrl.openStream();
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(openStream);
-            NodeList formattedForecast = doc.getElementsByTagName("icon");
+         String station;
+         try {
+             URL stationUrl = new URL(IPURL);
+             InputStream openStream = stationUrl.openStream();
+             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+             DocumentBuilder db = dbf.newDocumentBuilder();
+             Document doc = db.parse(openStream);
+             NodeList formattedStation = doc.getElementsByTagName("icao");
+            Element formattedStationElement =
+                     (Element) formattedStation.item(0);
+             station = formattedStationElement.getTextContent();
+         } catch (Exception e) {
+             station = "";
+         }
+         return station;
+       
 
+     }
+
+         public int getForecast() {
+         String forecast;
+         String station = getWeatherStation();
+        String weatherUrl =
+                "http://api.wunderground.com/api/ee6756280a23f6e9/forecast/q/"
+                 + station + ".xml";
+         try {
+             URL forecastUrl = new URL(weatherUrl);
+             InputStream openStream = forecastUrl.openStream();
+             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+             DocumentBuilder db = dbf.newDocumentBuilder();
+             Document doc = db.parse(openStream);
+             NodeList formattedForecast = doc.getElementsByTagName("icon");
             Element formattedForecastElement =
-                    (Element) formattedForecast.item(TOMMOROWFORECAST);
-            forecast = formattedForecastElement.getTextContent();
-        } catch (Exception e) {
-            forecast = "";
-        }
+                    (Element) formattedForecast.item(TODAYFORECAST);
+             forecast = formattedForecastElement.getTextContent();
+         } catch (Exception e) {
+             forecast = "";
+         }
+
 
         if (forecast.contains("clear")) {
-            return CLEARWEATHER;
+             return CLEARWEATHER;
+
         } else if (forecast.contains("cloudy")) {
-            return CLOUDYWEATHER;
+             return CLOUDYWEATHER;
         } else if (forecast.contains("rain")) {
-            return RAINYWEATHER;
-        } else {
-            return CLEARWEATHER;
-        }
-    }
+             return RAINYWEATHER;
+         } else {
+             return CLEARWEATHER;
+         }
+     }
 }
