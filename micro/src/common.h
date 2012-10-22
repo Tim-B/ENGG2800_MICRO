@@ -11,12 +11,16 @@
     
     #define TEST
 
+    // When debug mode is enabled acts as printf, otherwise does nothing
     #ifdef DEBUG
         #define DEBUG_PRINT(a, ...) printf(a, ##__VA_ARGS__)
     #else
         #define DEBUG_PRINT(a, ...) (void)0
     #endif
 
+    /**
+     * Definitions for development board
+     */
     #ifdef ARDUINO
         #define F_CPU 16000000UL
         #define UBRRH_def UBRR0H

@@ -46,6 +46,7 @@ void setHourDisplay() {
 void setMinuteDisplay() {
     int pin = getMinute() / 5;
     setArray(pin, HIGH);
+    // Work out if hour and minute are aligned
     if(pin == toggleLED) {
         cancelToggle = true;
     } else {
@@ -68,6 +69,7 @@ void setMinuteDisplay() {
  * If the buzzer is on then the buzzer is toggled and alarmCount incremented.
  */
 void toggle() {
+    // Don't toggle if in programming mode
     if(!isProgramming()) {
         if(!cancelToggle) {
             setArray(toggleLED, toggleState);
@@ -81,6 +83,7 @@ void toggle() {
             updateWeather(NONE);
         }
     }
+    // Buzzzzzzzz
     if(buzzerOn == HIGH) {
         buzzer(toggleState);
         DEBUG_PRINT("Alarm count %i\n", alarmCount);

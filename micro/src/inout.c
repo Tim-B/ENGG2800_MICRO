@@ -88,10 +88,12 @@ void buzzer(IOBit on) {
  * Initializes the LED array and latches.
  */
 void setupArray() {
+    // Set data direction registers
     DDRC |= ALARM_BUZZER_VALUE;
     DDRC |= ALARM_LED_VALUE;
     DDRC |= PM_LED_VALUE;
     DDRC |= 0x07;
+    
     latchAddressTranslate[0] = 4;
     latchAddressTranslate[1] = 5;
     latchAddressTranslate[2] = 7;
@@ -112,10 +114,6 @@ void setupArray() {
     LATCH1_DDR |= LATCH1_DDRMASK;
     LATCH2_DDR |= LATCH2_DDRMASK;
     clearArray();
-    // setArray(14, HIGH);
-    // setArray(1, HIGH);
-    // setArray(2, HIGH);
-    // setArray(3, HIGH);
 }
 
 /**
@@ -162,8 +160,8 @@ void setArray(int value, IOMode mode) {
     }
     
     _delay_us(100);
+    
     // Back to memory mode!
     LATCH_PORT1 |= LATCH1_MEMORY;
     LATCH_PORT2 |= LATCH2_MEMORY;
-
 }

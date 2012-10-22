@@ -18,19 +18,14 @@ int old = 0;
  * Initializes pins, clock, IO, etc.
  */
 void setup() {
-    // DDRE = 0x00;
-    // setupSerial();
-    // setupPins(); 
-    // DEBUG_PRINT("START\n");
     
     setupSerial();
     setupArray();
     setupClock();
     setupControl();
-    
-    // DDRD &= ~0x08;
+
     sei();
-    // DEBUG_PRINT("START\n");
+    
 }
 
 
@@ -38,7 +33,7 @@ void setup() {
  * Run continuously in a loop.
  */
 void loop() {
-    // DEBUG_PRINT("TICK\n");
+    // Check for any waiting commands or display updates.
     cycle();
     timeCycle();
 }

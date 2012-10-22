@@ -27,10 +27,13 @@ bool pcWaiting = false;
  */
 void setupControl() {
     commandWaiting = 0;
+    
+    //Setup data direction registers
     SENSOR_PORT &= ~SENSOR_DDR_MASK;
     EICR_def |= EICR_value;
     EIMSK_def |= EIMSK_OPTIC_VALUE;
     EIMSK_def |= EIMSK_IR_VALUE;
+    
     DEBUG_PRINT("interrupt setup\n");
 }
 
@@ -60,11 +63,13 @@ ISR(INT0_vect) {
  */
 void IRIncomming() {
     int code = readCommand();
+    // If code is 255 then it's obviously bogus
     if (code == 255) {
         IRwaiting = false;
         enableIRInt();
         return;
     }
+    // Delegate out to one of the IR functions
     switch (code) {
         case TOGGLE_ALARM:
             processToggleAlarm();
@@ -82,7 +87,10 @@ void IRIncomming() {
             processCancel();
             break;
     }
+    
+    // Throttle IR command rate so that we don't get duplicate commands
     _delay_ms(1000);
+    
     IRwaiting = false;
     enableIRInt();
 }
@@ -93,6 +101,8 @@ void IRIncomming() {
  */
 void processIncrement() {
     tmpValue++;
+    
+    // Choose which mode to use when incrementing
     switch (stage) {
         case NO_COMMAND:
             return;
@@ -126,11 +136,14 @@ void incrementInner() {
     if (tmpValue > 4) {
         tmpValue = 0;
     }
+    
+    // Display no LEDs when the tmpValue is 0
     if (tmpValue == 0) {
         clearArray();
     } else {
         displayVal(tmpValue + 11);
     }
+    
 }
 
 /**
@@ -138,6 +151,7 @@ void incrementInner() {
  * blocks).
  */
 void incrementOuter() {
+    // Reset when the clock gets to the top
     if (tmpValue > 11) {
         tmpValue = 0;
     }
@@ -155,6 +169,7 @@ void incrementHour() {
         tmpValue = 0;
     }
     int displayIndex = tmpValue;
+    // Deal with 24 hour time
     if (tmpValue < 12) {
         displayVal(displayIndex);
         pmLED(false);
@@ -344,6 +359,7 @@ void pcIncomming() {
 
     uint8_t end_check = readPCWord();
 
+    // Check all the inverse values, making sure to mask out the first 8 bits
     if ((~time1_check & 0x00FF) != time1) {
         DEBUG_PRINT("Time check 1 failed: %u %u\n", ~time1_check, time1);
         programFailed();
@@ -394,11 +410,13 @@ void pcIncomming() {
 
     setTime(newTime * 60);
     
+    // Check if alarm is being set
     if (settings & 0x80) {
         setAlarm(newAlarm * 60);
         DEBUG_PRINT("Alarm set\n");
     }
 
+    // Check if alarm is active
     if (settings & 0x40) {
         setAlarmActive(1);
         DEBUG_PRINT("Alarm active\n");
@@ -406,6 +424,7 @@ void pcIncomming() {
         setAlarmActive(0);
     }
 
+    // Set weather
     if(settings & 0x20) {
         int weather = (settings & 0x18) >> 3;
         DEBUG_PRINT("Weather: %i\n", weather);
@@ -459,6 +478,7 @@ bool checkStart() {
         tmpBit = readPCBit();
         output = output << 1;
         output |= tmpBit;
+        // Compare all but the first two bits
         if ((output & 0b00111111) == 0b00101011) {
             // DEBUG_PRINT("Start match: %i\n", output);
             return true;
@@ -489,7 +509,6 @@ uint8_t readPCWord() {
  */
 void programFailed() {
     // DEBUG_PRINT("PC Programming failed\n");
-    _delay_ms(1000);
     pcWaiting = false;
     enablePCInt();
 }
@@ -511,7 +530,6 @@ uint8_t readPCBit() {
     int avgCount = 0;
     int value = 0;
     int i;
-    // _delay_ms(24);
     _delay_ms(43);
     for (i = 0; i < 8; i++) {
         value = SENSOR_PIN & SENSOR_OPTICAL_MASK;

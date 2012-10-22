@@ -1,8 +1,8 @@
 #include "common.h"
 
 /**
- * Entry script to the application, calles setup() then loop() repeatedly
- * @return always 0
+ * Entry function to the application, calles setup() then loop() repeatedly
+ * @return always 0 (but never should return)
  */
 int main(void) {
     setup();
