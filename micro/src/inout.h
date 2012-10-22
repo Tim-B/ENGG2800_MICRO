@@ -9,7 +9,6 @@
     #define INOUT_H
     #include <stdio.h>
     #include <stdbool.h>
-    #include "pins.h"
     #define RX_BUFSIZE 80
     #define UART_BAUD  9600
 
@@ -26,9 +25,6 @@
     int latchAddressTranslate[16];
     
     void setupSerial();
-    
-    void clearPort(Port);
-    void clearMultiPins(Port, int);
     
     void setupArray();
     void clearArray();

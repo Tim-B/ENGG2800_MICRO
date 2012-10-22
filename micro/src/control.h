@@ -13,7 +13,7 @@
     uint8_t readPCWord();
     void programFailed();
     void programSuccess();
-    int readPCBit();
+    uint8_t readPCBit();
     void disablePCInt();
     void enablePCInt();
     void disableIRInt();
@@ -26,12 +26,13 @@
     void incrementInner();
     void incrementOuter();
     void displayVal(int value);
-    void setNewTime();
+    void setNewTime(uint32_t);
     bool isProgramming();
     bool checkStart();
     void processCancel();
     void incrementHour();
     void cycle();
+    void pcIncomming();
     
     typedef enum {
         NO_COMMAND = 0,
