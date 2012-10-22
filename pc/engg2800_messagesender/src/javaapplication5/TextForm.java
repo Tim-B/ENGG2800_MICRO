@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.text.NumberFormatter;
 
 /**
- *
+ * Extends JPanel to make it a form of text fields
  * @author Michael
  */
 class TextForm extends JPanel {
@@ -63,7 +63,12 @@ class TextForm extends JPanel {
             fieldPanel.add(p);
         }
     }
-
+/*
+ * Converts 2 integer values, hour and minute into a binary timestamp
+ * @param hour the index of the hour text box
+ * @param minute the index of the minute text box
+ * @param wordLength the length of the binary timestamp
+ */
     public ArrayList<Integer> getBinary(int hour, int minute, int wordLength) {
         ArrayList<Integer> list = new ArrayList();
         int hourInt;

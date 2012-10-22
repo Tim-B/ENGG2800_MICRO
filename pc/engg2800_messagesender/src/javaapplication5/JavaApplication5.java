@@ -47,12 +47,20 @@ public class JavaApplication5 extends JFrame {
     private static final Color HIGHCOLOR = Color.WHITE;
     private static final Color LOWCOLOR = Color.BLACK;
 
+    /**
+     * 
+     * @param args
+     * @throws InterruptedException
+     */
     public static void main(String[] args) throws InterruptedException {
         new JavaApplication5();
     }
 
-    /**
-     * @param args the command line arguments
+    /** 
+     * The main function of the application. Sets up the basic GUI and adds the
+     * ActionListener to the submit button.
+     * @throws InterruptedException is thrown if the sleep() function isnt
+     * executed properly
      */
     public JavaApplication5() throws InterruptedException {
         super("Message Sender");
@@ -140,7 +148,10 @@ public class JavaApplication5 extends JFrame {
         startSequence.add(1);
         startSequence.add(1);
         submit.addActionListener(new ActionListener() {
-
+/**
+ * The ActionListener function, this function is called when the submit
+ * button is pressed. Adds values from the gui to the global list.
+ */
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Integer> temporaryList = new ArrayList();
                 temporaryList.addAll(form.getBinary(CLOCKHOURTEXT, CLOCKMINUTETEXT, LONGLENGTH));
@@ -167,6 +178,14 @@ public class JavaApplication5 extends JFrame {
         }
     }
 
+    /**
+     * Changes the color of the display panel based on a list of integers message.
+     * @param message Array of integers that represent binary numbers and flags
+     * @param rate The rate that the color changes
+     * @param panel The panel to be changed
+     * @param high The high color
+     * @param low The low color
+     */
     public void changeColor(ArrayList<Integer> message, int rate, JPanel panel, Color high, Color low) {
         for (int i : message) {
             if (i == 1) {
@@ -183,6 +202,15 @@ public class JavaApplication5 extends JFrame {
         }
     }
 
+    /**
+     * The function that adds the flags to the global list
+     * @param setWeather the value of set weather checkbox
+     * @param setAlarm the value of set alarm checkbox
+     * @param setActive the value of set alarm active checkbox
+     * @param forecast a integer value betwene 0 and 2 that represents 
+     * the forecast
+     * @return
+     */
     public ArrayList<Integer> addFlags(Boolean setWeather,
             Boolean setAlarm, Boolean setActive, int forecast) {
         ArrayList<Integer> list = new ArrayList();
@@ -226,6 +254,10 @@ public class JavaApplication5 extends JFrame {
         return list;
     }
     
+    /**
+     * Finds the appropriate weather station for the IP address of the computer
+     * @return string value of the weather station
+     */
     public String getWeatherStation() {
 
          String station;
@@ -247,7 +279,12 @@ public class JavaApplication5 extends JFrame {
 
      }
 
-         public int getForecast() {
+    /**
+     * Returns an integer value between 0 and 3 that represents the weather forecase
+     * 
+     * @return 0 = fine, 1 = cloudy, 2 = rainy
+     */
+    public int getForecast() {
          String forecast;
          String station = getWeatherStation();
         String weatherUrl =
